@@ -84,6 +84,18 @@ class PatientTrajectory(BaseModel):
     trajectory_id: str = Field(default_factory=lambda: f"traj_{uuid4().hex[:8]}")
     state_change_rules: List[StateChangeRule] = Field(default_factory=list)
 
+    # Examination findings for each state (generated when user performs in-person review)
+    examination_findings: Dict[str, Dict[str, Any]] = Field(
+        default_factory=dict,
+        description="Physical examination findings for each patient state"
+    )
+
+    # Investigation result templates for each state
+    investigation_templates: Dict[str, Dict[str, Dict[str, Any]]] = Field(
+        default_factory=dict,
+        description="Investigation result templates for each state and investigation type"
+    )
+
     def get_applicable_rules(
         self,
         current_state: PatientState,
@@ -99,6 +111,15 @@ class PatientTrajectory(BaseModel):
                 continue
             applicable.append(rule)
         return applicable
+
+    def get_examination_findings(self, state: PatientState) -> Optional[Dict[str, Any]]:
+        """Get examination findings for a specific patient state."""
+        return self.examination_findings.get(state.value)
+
+    def get_investigation_template(self, state: PatientState, investigation_type: str) -> Optional[Dict[str, Any]]:
+        """Get investigation result template for a specific state and investigation type."""
+        state_templates = self.investigation_templates.get(state.value, {})
+        return state_templates.get(investigation_type)
 
 
 class Patient(BaseModel):

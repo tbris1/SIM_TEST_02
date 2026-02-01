@@ -40,7 +40,8 @@ class Settings(BaseSettings):
     openai_model: str = "gpt-4"
 
     class Config:
-        env_file = ".env"
+        # Look for .env in project root (parent of backend directory)
+        env_file = Path(__file__).parent.parent.parent / ".env"
         env_file_encoding = "utf-8"
         case_sensitive = False
 

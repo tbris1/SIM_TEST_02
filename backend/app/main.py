@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .config import settings
 
 # Import API routers
-from .api import sessions, actions
+from .api import sessions, actions, ehr
 
 app = FastAPI(
     title=settings.app_name,
@@ -51,6 +51,7 @@ async def health_check():
 # Register API routers
 app.include_router(sessions.router, prefix=settings.api_prefix, tags=["sessions"])
 app.include_router(actions.router, prefix=settings.api_prefix, tags=["actions"])
+app.include_router(ehr.router, prefix=settings.api_prefix, tags=["ehr"])
 
 
 if __name__ == "__main__":

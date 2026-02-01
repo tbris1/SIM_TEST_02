@@ -1,0 +1,410 @@
+{
+  "scenario_id": "simple_test_ehr",
+  "metadata": {
+    "title": "EHR System Test Scenario - Progressive Revelation",
+    "description": "Test scenario demonstrating progressive EHR data revelation",
+    "difficulty": "easy",
+    "learning_objectives": [
+      "Understand progressive EHR revelation",
+      "Practice gathering clinical information",
+      "Recognize when to review patient in person"
+    ],
+    "estimated_duration_minutes": 30,
+    "simulated_duration_hours": 1.5
+  },
+  "simulation_settings": {
+    "start_time": "2024-01-15T20:00:00"
+  },
+  "patients": [
+    {
+      "patient_id": "pt_001",
+      "name": "Margaret Thompson",
+      "mrn": "MRN12345",
+      "age": 72,
+      "gender": "Female",
+      "ward": "Ward 4A",
+      "bed": "Bed 12",
+      "initial_state": "stable_with_concerns",
+      "trajectory": {
+        "state_change_rules": [
+          {
+            "rule_id": "deterioration_at_2130",
+            "trigger_type": "time_elapsed",
+            "trigger_time": "2024-01-15T21:30:00",
+            "current_state_requirement": "stable_with_concerns",
+            "new_state": "deteriorating",
+            "clinical_manifestation": "Patient has increased work of breathing, O2 sats dropped to 88%",
+            "notification_message": "Nurse calling: Margaret Thompson is more breathless",
+            "urgency": "high"
+          },
+          {
+            "rule_id": "stabilize_on_escalation",
+            "trigger_type": "escalation_occurred",
+            "current_state_requirement": null,
+            "new_state": "stable",
+            "clinical_manifestation": "Registrar reviewed, started NIV, patient improving",
+            "notification_message": "Patient stabilized after registrar review",
+            "urgency": "low"
+          },
+          {
+            "rule_id": "critical_if_no_escalation",
+            "trigger_type": "action_not_taken",
+            "required_action": "escalate",
+            "action_deadline": "2024-01-15T22:00:00",
+            "current_state_requirement": "deteriorating",
+            "new_state": "critically_unwell",
+            "clinical_manifestation": "Patient increasingly drowsy, CO2 retention suspected",
+            "notification_message": "URGENT: Margaret Thompson critically unwell",
+            "urgency": "critical"
+          }
+        ],
+        "examination_findings": {
+          "stable_with_concerns": {
+            "general": "Patient sitting up in bed, appears mildly short of breath",
+            "appearance": "Alert and orientated, speaking in full sentences",
+            "observations": "RR 22, SpO2 92% on 2L/min via nasal cannula, HR 92, BP 145/88, Temp 36.8°C",
+            "respiratory": "Using accessory muscles. Reduced air entry bilateral bases with scattered wheeze throughout. Percussion resonant.",
+            "cardiovascular": "Dual heart sounds, normal volume. No murmurs. Peripheral pulses present. Capillary refill <2 seconds.",
+            "abdominal": "Soft, non-tender, no organomegaly",
+            "neurological": "GCS 15/15 (E4V5M6). Pupils equal and reactive.",
+            "skin": "Warm and dry, no rash or cyanosis",
+            "impression": "Patient with known COPD, currently stable but with concerning features (increased work of breathing, borderline oxygen saturations)"
+          },
+          "deteriorating": {
+            "general": "Patient visibly distressed, significant work of breathing",
+            "appearance": "Alert but anxious, speaking in short phrases only",
+            "observations": "RR 28, SpO2 88% on 4L/min via nasal cannula, HR 105, BP 152/92, Temp 37.1°C",
+            "respiratory": "Marked use of accessory muscles, pursed lip breathing. Poor air entry bilaterally. Widespread wheeze and prolonged expiratory phase.",
+            "cardiovascular": "Tachycardic but regular rhythm. Dual heart sounds. JVP not elevated.",
+            "abdominal": "Soft, non-tender",
+            "neurological": "GCS 15/15, appears fatigued",
+            "skin": "Warm, mild peripheral cyanosis noted",
+            "impression": "COPD exacerbation with worsening respiratory failure. Patient deteriorating despite nebulizers. Consider ABG and escalation."
+          },
+          "critically_unwell": {
+            "general": "Patient appears exhausted, drowsy",
+            "appearance": "Reduced level of consciousness, responding to voice only",
+            "observations": "RR 32 shallow, SpO2 85% on 15L via non-rebreathe mask, HR 115, BP 138/85, Temp 37.2°C",
+            "respiratory": "Paradoxical breathing pattern. Minimal air entry. Unable to speak.",
+            "cardiovascular": "Tachycardic, weak pulses",
+            "abdominal": "Unable to assess adequately",
+            "neurological": "GCS 13/15 (E3V4M6) - drowsy, confused. Pupils equal and reactive but sluggish.",
+            "skin": "Clammy, central cyanosis present",
+            "impression": "Critical deterioration. Severe Type 2 respiratory failure with CO2 retention causing reduced consciousness. NIV or intubation urgently required."
+          },
+          "stable": {
+            "general": "Patient comfortable at rest",
+            "appearance": "Alert, orientated, conversing normally",
+            "observations": "RR 18, SpO2 95% on 2L/min, HR 82, BP 138/82, Temp 36.9°C",
+            "respiratory": "Comfortable breathing. Good air entry bilaterally. Minimal wheeze.",
+            "cardiovascular": "Normal heart sounds, regular rhythm",
+            "abdominal": "Soft, non-tender",
+            "neurological": "GCS 15/15, appropriate responses",
+            "skin": "Warm and well perfused",
+            "impression": "Clinically improved following appropriate escalation and treatment. Continue current management."
+          }
+        },
+        "investigation_templates": {
+          "stable_with_concerns": {
+            "ABG": {
+              "result_data": {"pH": 7.35, "pCO2": 6.5, "pO2": 8.5, "HCO3": 26, "Lactate": 1.1},
+              "interpretation": "Mild Type 2 respiratory failure with compensation",
+              "abnormal_flags": ["Slightly low pH", "Elevated pCO2", "Low pO2"]
+            },
+            "FBC": {
+              "result_data": {"Hb": 13.2, "WCC": 11.5, "Platelets": 245, "Neutrophils": 8.2},
+              "interpretation": "Mild leukocytosis, possibly infective",
+              "abnormal_flags": ["Elevated WCC"]
+            },
+            "U&E": {
+              "result_data": {"Na": 138, "K": 4.2, "Urea": 6.8, "Creatinine": 95, "eGFR": 62},
+              "interpretation": "Normal renal function",
+              "abnormal_flags": []
+            },
+            "CXR": {
+              "result_data": {"findings": "Hyperinflated lung fields consistent with COPD. No focal consolidation. No pneumothorax."},
+              "interpretation": "Changes consistent with known COPD. No acute pathology.",
+              "abnormal_flags": []
+            }
+          },
+          "deteriorating": {
+            "ABG": {
+              "result_data": {"pH": 7.32, "pCO2": 7.8, "pO2": 8.2, "HCO3": 28, "Lactate": 1.2},
+              "interpretation": "Type 2 respiratory failure with partial compensation",
+              "abnormal_flags": ["Low pH", "High pCO2", "Low pO2"]
+            },
+            "FBC": {
+              "result_data": {"Hb": 13.0, "WCC": 12.8, "Platelets": 250, "Neutrophils": 9.5},
+              "interpretation": "Moderate leukocytosis",
+              "abnormal_flags": ["Elevated WCC"]
+            },
+            "U&E": {
+              "result_data": {"Na": 137, "K": 4.3, "Urea": 7.2, "Creatinine": 98, "eGFR": 60},
+              "interpretation": "Normal renal function",
+              "abnormal_flags": []
+            },
+            "CXR": {
+              "result_data": {"findings": "Hyperinflated lung fields. Possible right lower zone opacity - ? consolidation vs atelectasis."},
+              "interpretation": "Possible infective focus right lower zone",
+              "abnormal_flags": ["Possible consolidation"]
+            }
+          },
+          "critically_unwell": {
+            "ABG": {
+              "result_data": {"pH": 7.22, "pCO2": 9.5, "pO2": 7.1, "HCO3": 30, "Lactate": 2.8},
+              "interpretation": "Severe Type 2 respiratory failure with acidosis",
+              "abnormal_flags": ["Very low pH", "Very high pCO2", "Very low pO2", "Elevated lactate"]
+            },
+            "FBC": {
+              "result_data": {"Hb": 12.8, "WCC": 15.2, "Platelets": 255, "Neutrophils": 11.5},
+              "interpretation": "Significant leukocytosis",
+              "abnormal_flags": ["High WCC"]
+            },
+            "U&E": {
+              "result_data": {"Na": 135, "K": 4.5, "Urea": 8.5, "Creatinine": 105, "eGFR": 55},
+              "interpretation": "Mild pre-renal impairment",
+              "abnormal_flags": ["Slightly elevated urea and creatinine"]
+            },
+            "CXR": {
+              "result_data": {"findings": "Hyperinflated lungs. Right lower zone consolidation. No pneumothorax. Cardiomediastinal contours normal."},
+              "interpretation": "Right lower lobe pneumonia on background of COPD",
+              "abnormal_flags": ["Consolidation confirmed"]
+            }
+          },
+          "stable": {
+            "ABG": {
+              "result_data": {"pH": 7.38, "pCO2": 6.0, "pO2": 10.5, "HCO3": 25, "Lactate": 0.9},
+              "interpretation": "Compensated respiratory picture, much improved",
+              "abnormal_flags": ["Slightly elevated pCO2"]
+            },
+            "FBC": {
+              "result_data": {"Hb": 13.1, "WCC": 9.2, "Platelets": 248, "Neutrophils": 6.5},
+              "interpretation": "Normalizing white cell count",
+              "abnormal_flags": []
+            },
+            "U&E": {
+              "result_data": {"Na": 139, "K": 4.1, "Urea": 6.5, "Creatinine": 92, "eGFR": 64},
+              "interpretation": "Normal renal function",
+              "abnormal_flags": []
+            },
+            "CXR": {
+              "result_data": {"findings": "Hyperinflated lung fields. Resolving right lower zone changes."},
+              "interpretation": "Improving consolidation",
+              "abnormal_flags": []
+            }
+          }
+        }
+      },
+      "initial_request": {
+        "request_time": "2024-01-15T20:05:00",
+        "request_type": "nurse_call",
+        "nurse_concern": "Patient more short of breath, could you review?",
+        "urgency": "urgent"
+      },
+      "ehr": {
+        "allergies": ["Penicillin"],
+        "active_diagnoses": [
+          "COPD (GOLD 3)",
+          "Type 2 Diabetes",
+          "Hypertension"
+        ],
+        "current_medications": [
+          {"name": "Salbutamol inhaler", "dose": "2 puffs PRN"},
+          {"name": "Tiotropium inhaler", "dose": "18mcg OD"},
+          {"name": "Metformin", "dose": "500mg BD"},
+          {"name": "Amlodipine", "dose": "5mg OD"}
+        ],
+        "clinical_notes": [
+          {
+            "note_type": "admission",
+            "timestamp": "2024-01-15T14:30:00",
+            "author": "Dr. James Wilson",
+            "author_role": "FY1",
+            "title": "Admission Clerking",
+            "content": {
+              "presenting_complaint": "Shortness of breath",
+              "history_presenting_complaint": "3 day history of increasing SOB, productive cough with green sputum. Normally independent for ADLs. No chest pain or haemoptysis.",
+              "past_medical_history": ["COPD (GOLD 3)", "Type 2 Diabetes", "Hypertension"],
+              "medications": [
+                "Salbutamol inhaler 2 puffs PRN",
+                "Tiotropium inhaler 18mcg OD",
+                "Metformin 500mg BD",
+                "Amlodipine 5mg OD"
+              ],
+              "social_history": "Lives alone, independent. Ex-smoker (50 pack years), quit 5 years ago.",
+              "examination": {
+                "general": "Alert, comfortable at rest",
+                "observations": "RR 20, SpO2 94% on 2L/min, HR 88, BP 142/85, Temp 37.2",
+                "respiratory": "Reduced air entry bilateral bases, scattered wheeze",
+                "cardiovascular": "Dual heart sounds, no murmurs",
+                "abdominal": "Soft, non-tender",
+                "neuro": "GCS 15/15"
+              },
+              "initial_plan": [
+                "CXR",
+                "Bloods (FBC, U&E, CRP)",
+                "ABG if deteriorates",
+                "Nebulizers PRN",
+                "Monitor observations"
+              ]
+            },
+            "visibility_rule": {
+              "condition": "always"
+            }
+          },
+          {
+            "note_type": "progress",
+            "timestamp": "2024-01-15T18:00:00",
+            "author": "Dr. Sarah Chen",
+            "author_role": "Registrar",
+            "title": "Evening Ward Round",
+            "content": {
+              "update": "Patient seen on evening round. Clinically stable, tolerating oral intake.",
+              "examination": {
+                "observations": "RR 18, SpO2 95% on 2L/min, HR 85, BP 138/82",
+                "respiratory": "Improved air entry, less wheeze"
+              },
+              "plan": [
+                "Continue current management",
+                "Consider discharge tomorrow if stable",
+                "Follow up CXR result"
+              ]
+            },
+            "visibility_rule": {
+              "condition": "always"
+            }
+          },
+          {
+            "note_type": "nursing_note",
+            "timestamp": "2024-01-15T19:45:00",
+            "author": "Staff Nurse Emma Roberts",
+            "author_role": "RN",
+            "title": "Nursing Observations",
+            "content": {
+              "observations": "RR 22, SpO2 92% on 2L/min, HR 92, BP 145/88",
+              "clinical_note": "Patient reports feeling slightly more breathless. Encouraged deep breathing exercises. Will continue to monitor.",
+              "actions": "Administered salbutamol nebulizer as prescribed"
+            },
+            "visibility_rule": {
+              "condition": "always"
+            }
+          },
+          {
+            "note_type": "consultant_review",
+            "timestamp": "2024-01-14T10:00:00",
+            "author": "Dr. Michael Patterson",
+            "author_role": "Consultant Respiratory",
+            "title": "Consultant Review - Previous Admission",
+            "content": {
+              "review": "Reviewed patient during previous admission 3 months ago for COPD exacerbation.",
+              "assessment": "Known difficult to manage COPD. Previous admission required NIV support for Type 2 respiratory failure.",
+              "recommendation": "Low threshold for NIV if deteriorates. Avoid high flow oxygen - risk of CO2 retention."
+            },
+            "visibility_rule": {
+              "condition": "always"
+            }
+          }
+        ],
+        "investigation_results": [
+          {
+            "investigation_type": "CXR",
+            "requested_time": "2024-01-15T14:45:00",
+            "resulted_time": "2024-01-15T16:30:00",
+            "result_data": {
+              "findings": "Hyperinflated lung fields consistent with COPD. No focal consolidation. No pneumothorax.",
+              "conclusion": "Changes consistent with known COPD. No acute pathology."
+            },
+            "interpretation": "No acute pathology on CXR",
+            "abnormal_flags": [],
+            "visibility_rule": {
+              "condition": "always"
+            }
+          },
+          {
+            "investigation_type": "FBC",
+            "requested_time": "2024-01-15T14:45:00",
+            "resulted_time": "2024-01-15T17:00:00",
+            "result_data": {
+              "Hb": 13.2,
+              "WCC": 11.5,
+              "Platelets": 245,
+              "Neutrophils": 8.2
+            },
+            "interpretation": "Mild leukocytosis, possibly infective",
+            "abnormal_flags": ["Elevated WCC"],
+            "visibility_rule": {
+              "condition": "time_elapsed",
+              "visible_after_time": "2024-01-15T17:00:00"
+            }
+          },
+          {
+            "investigation_type": "U&E",
+            "requested_time": "2024-01-15T14:45:00",
+            "resulted_time": "2024-01-15T17:00:00",
+            "result_data": {
+              "Na": 138,
+              "K": 4.2,
+              "Urea": 6.8,
+              "Creatinine": 95,
+              "eGFR": 62
+            },
+            "interpretation": "Normal renal function",
+            "abnormal_flags": [],
+            "visibility_rule": {
+              "condition": "time_elapsed",
+              "visible_after_time": "2024-01-15T17:00:00"
+            }
+          },
+          {
+            "investigation_type": "ABG",
+            "requested_time": "2024-01-15T20:10:00",
+            "resulted_time": "2024-01-15T20:30:00",
+            "result_data": {
+              "pH": 7.32,
+              "pCO2": 7.8,
+              "pO2": 8.2,
+              "HCO3": 28,
+              "Lactate": 1.2
+            },
+            "interpretation": "Type 2 respiratory failure with partial compensation",
+            "abnormal_flags": ["Low pH", "High pCO2", "Low pO2"],
+            "visibility_rule": {
+              "condition": "time_elapsed",
+              "visible_after_time": "2024-01-15T20:30:00"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "scheduled_events": [
+    {
+      "event_id": "initial_request",
+      "event_type": "new_request",
+      "scheduled_time": "2024-01-15T20:05:00",
+      "patient_id": "pt_001",
+      "data": {
+        "request_type": "nurse_call",
+        "initial_concern": "Patient more short of breath",
+        "urgency": "urgent",
+        "notification_message": "Nurse calling from Ward 4A about Margaret Thompson"
+      }
+    },
+    {
+      "event_id": "abg_results",
+      "event_type": "investigation_result",
+      "scheduled_time": "2024-01-15T20:30:00",
+      "patient_id": "pt_001",
+      "data": {
+        "investigation_type": "ABG",
+        "result_data": {
+          "pH": 7.32,
+          "pCO2": 7.8,
+          "pO2": 8.2,
+          "interpretation": "Type 2 respiratory failure"
+        },
+        "notification_message": "ABG results available for Margaret Thompson"
+      }
+    }
+  ]
+}

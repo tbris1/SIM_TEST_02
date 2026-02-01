@@ -11,6 +11,11 @@ from ..config import settings
 from ..models.simulation import SimulationClock, EventScheduler, SimulationSession
 from ..models.patient import Patient, StateChangeRule, PatientTrajectory
 from ..models.events import Event
+from ..models.ehr import (
+    NoteType, VisibilityCondition, VisibilityRule,
+    ClinicalNote, InvestigationResult
+)
+from .ehr_service import ehr_service
 
 
 class ScenarioLoader:
@@ -149,6 +154,11 @@ class ScenarioLoader:
             scheduled_time = datetime.fromisoformat(event_data["scheduled_time"])
             scheduler.schedule(event, scheduled_time)
 
+        # Load EHR data for each patient
+        for patient_data in scenario_data.get("patients", []):
+            if "ehr" in patient_data:
+                self._load_ehr_data(patient_data, scenario_start_time)
+
         return session
 
     def _create_patient_from_data(self, patient_data: Dict[str, Any]) -> Patient:
@@ -189,9 +199,17 @@ class ScenarioLoader:
             )
             state_change_rules.append(rule)
 
+        # Load examination findings (if present in scenario)
+        examination_findings = trajectory.get("examination_findings", {})
+
+        # Load investigation templates (if present in scenario)
+        investigation_templates = trajectory.get("investigation_templates", {})
+
         # Create patient trajectory
         patient_trajectory = PatientTrajectory(
-            state_change_rules=state_change_rules
+            state_change_rules=state_change_rules,
+            examination_findings=examination_findings,
+            investigation_templates=investigation_templates
         )
 
         # Create patient
@@ -227,6 +245,114 @@ class ScenarioLoader:
         )
 
         return event
+
+    def _load_ehr_data(
+        self,
+        patient_data: Dict[str, Any],
+        scenario_start_time: datetime
+    ) -> None:
+        """
+        Load EHR data for a patient from scenario JSON.
+
+        Args:
+            patient_data: Patient dictionary from scenario JSON
+            scenario_start_time: Start time of the scenario
+        """
+        ehr_data = patient_data.get("ehr", {})
+        patient_id = patient_data["patient_id"]
+
+        # Create patient EHR record
+        ehr_service.create_patient_record(
+            patient_id=patient_id,
+            mrn=patient_data["mrn"],
+            name=patient_data["name"],
+            age=patient_data["age"],
+            gender=patient_data["gender"],
+            allergies=ehr_data.get("allergies", []),
+            active_diagnoses=ehr_data.get("active_diagnoses", []),
+            current_medications=ehr_data.get("current_medications", [])
+        )
+
+        # Load clinical notes
+        for note_data in ehr_data.get("clinical_notes", []):
+            # Parse visibility rule
+            visibility_rule = None
+            if "visibility_rule" in note_data:
+                visibility_rule = self._create_visibility_rule(
+                    note_data["visibility_rule"],
+                    patient_id,
+                    scenario_start_time
+                )
+
+            # Add note
+            ehr_service.add_clinical_note(
+                patient_id=patient_id,
+                note_type=NoteType(note_data["note_type"]),
+                timestamp=datetime.fromisoformat(note_data["timestamp"]),
+                author=note_data["author"],
+                author_role=note_data["author_role"],
+                title=note_data["title"],
+                content=note_data["content"],
+                visibility_rule=visibility_rule
+            )
+
+        # Load investigation results
+        for result_data in ehr_data.get("investigation_results", []):
+            # Parse visibility rule
+            visibility_rule = None
+            if "visibility_rule" in result_data:
+                visibility_rule = self._create_visibility_rule(
+                    result_data["visibility_rule"],
+                    patient_id,
+                    scenario_start_time
+                )
+
+            # Add result
+            ehr_service.add_investigation_result(
+                patient_id=patient_id,
+                investigation_type=result_data["investigation_type"],
+                requested_time=datetime.fromisoformat(result_data["requested_time"]),
+                resulted_time=datetime.fromisoformat(result_data["resulted_time"]),
+                result_data=result_data["result_data"],
+                interpretation=result_data.get("interpretation"),
+                abnormal_flags=result_data.get("abnormal_flags", []),
+                visibility_rule=visibility_rule
+            )
+
+    def _create_visibility_rule(
+        self,
+        rule_data: Dict[str, Any],
+        patient_id: str,
+        scenario_start_time: datetime
+    ) -> VisibilityRule:
+        """
+        Create a VisibilityRule from scenario JSON data.
+
+        Args:
+            rule_data: Visibility rule dictionary
+            patient_id: Patient identifier
+            scenario_start_time: Start time of scenario
+
+        Returns:
+            Initialized VisibilityRule
+        """
+        condition = VisibilityCondition(rule_data["condition"])
+
+        rule_kwargs = {
+            "condition": condition,
+            "patient_id": patient_id
+        }
+
+        # Add optional fields
+        if "visible_after_time" in rule_data:
+            rule_kwargs["visible_after_time"] = datetime.fromisoformat(
+                rule_data["visible_after_time"]
+            )
+
+        if "required_action" in rule_data:
+            rule_kwargs["required_action"] = rule_data["required_action"]
+
+        return VisibilityRule(**rule_kwargs)
 
 
 # Global scenario loader instance

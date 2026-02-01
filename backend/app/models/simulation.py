@@ -204,6 +204,10 @@ class SimulationSession(BaseModel):
             action.details
         )
 
+        # Generate examination note if this is an in-person review
+        if action.action_type == "review_in_person":
+            self._generate_examination_note(patient, new_time)
+
         # Calculate actual time advanced (including real time passage)
         time_advanced = int((new_time - old_time).total_seconds() / 60)
 
@@ -340,6 +344,42 @@ class SimulationSession(BaseModel):
             })
 
         return result
+
+    def _generate_examination_note(self, patient: Patient, timestamp: datetime):
+        """
+        Generate an examination note based on the patient's current state.
+        This simulates the clinician physically examining the patient and documenting findings.
+        """
+        # Import here to avoid circular dependency
+        from ..services.ehr_service import ehr_service
+        from ..models.ehr import NoteType, VisibilityRule, VisibilityCondition
+
+        # Check if patient has an EHR record
+        if not ehr_service.has_record(patient.patient_id):
+            # No EHR record exists - skip note generation
+            return
+
+        # Get examination findings for current state
+        examination_findings = patient.trajectory.get_examination_findings(patient.current_state)
+
+        if not examination_findings:
+            # No examination findings defined for this state - use default
+            examination_findings = {
+                "general": "Patient assessed",
+                "summary": f"Patient reviewed in person. Current state: {patient.current_state.value}"
+            }
+
+        # Generate clinical note with examination findings
+        ehr_service.add_clinical_note(
+            patient_id=patient.patient_id,
+            note_type=NoteType.PROGRESS,
+            timestamp=timestamp,
+            author="User",  # The trainee performing the review
+            author_role="FY1",
+            title=f"In-Person Review at {timestamp.strftime('%H:%M')}",
+            content=examination_findings,
+            visibility_rule=VisibilityRule(condition=VisibilityCondition.ALWAYS)
+        )
 
     def get_state(self) -> Dict[str, Any]:
         """Get complete current simulation state."""

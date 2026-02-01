@@ -197,9 +197,7 @@ Legend: ✅ Complete | ⏳ Current | 📅 Planned
 ## 🔑 Key Technical Decisions
 
 ### 1. Deterministic Simulation
-- Time advances ONLY when user takes actions
-- No background timers or real-time progression
-- Ensures reproducibility for testing and debugging
+- Time advances in real time, AND when user chooses to "review in person"
 - Same action sequence = identical results every time
 
 ### 2. Rule-Based State Transitions (Not Physiology)

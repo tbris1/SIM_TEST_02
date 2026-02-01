@@ -1,8 +1,8 @@
 # Project Progress Tracker
 
 **Last Updated**: 2026-02-01
-**Current Phase**: Phase 3 (EHR System)
-**Overall Completion**: 29% (2/7 phases)
+**Current Phase**: Phase 4 (AI Integration)
+**Overall Completion**: 43% (3/7 phases)
 
 ---
 
@@ -12,7 +12,7 @@
 |-------|------|--------|-------|----------|
 | 1 | Core Simulation Engine | ✅ Complete | 17/17 ✅ | ████████████████████ 100% |
 | 2 | API Layer | ✅ Complete | 33/33 ✅ | ████████████████████ 100% |
-| 3 | EHR System | 📅 Planned | - | ░░░░░░░░░░░░░░░░░░░░ 0% |
+| 3 | EHR System | ✅ Complete | 27/27 ✅ | ████████████████████ 100% |
 | 4 | AI Integration | 📅 Planned | - | ░░░░░░░░░░░░░░░░░░░░ 0% |
 | 5 | Frontend UI | 📅 Planned | - | ░░░░░░░░░░░░░░░░░░░░ 0% |
 | 6 | AI Feedback | 📅 Planned | - | ░░░░░░░░░░░░░░░░░░░░ 0% |
@@ -112,19 +112,104 @@
 
 ---
 
-## 📅 Phase 3: EHR System (PLANNED)
+## ✅ Phase 3: EHR System (COMPLETE)
 
-**Estimated Duration**: 1 week
+**Completed**: 2026-02-01
+**Duration**: ~2-3 hours
+**Tests Passing**: 27/27 ✅
+
+### What Works
+- [x] PatientRecord model with progressive revelation
+- [x] ClinicalNote and InvestigationResult models
+- [x] VisibilityRule with multiple conditions (time, action-based)
+- [x] EHRService for managing patient records
+- [x] PatientRecordView filtering service
+- [x] EHR API endpoints (get record, visibility summary, add notes/results)
+- [x] Scenario loader integration for EHR data
+- [x] Progressive revelation - data visibility updates based on time and actions
+- [x] Unit tests - 100% coverage of EHR system
+- [x] API tests - full coverage of EHR endpoints
+- [x] Demo script - interactive EHR demonstration
+
+### Key Files
+- ✅ `backend/app/models/ehr.py` (344 lines)
+- ✅ `backend/app/services/ehr_service.py` (281 lines)
+- ✅ `backend/app/api/ehr.py` (429 lines)
+- ✅ `backend/tests/test_ehr_system.py` (426 lines)
+- ✅ `backend/tests/test_api/test_ehr.py` (470 lines)
+- ✅ `data/scenarios/simple_test_ehr.json` (359 lines)
+- ✅ `backend/demo_ehr_system.py` (245 lines)
+
+### API Endpoints (4 new)
+**EHR Access:**
+- ✅ `GET /api/v1/sessions/{id}/patients/{patient_id}/ehr` - Get patient EHR view
+- ✅ `GET /api/v1/sessions/{id}/patients/{patient_id}/ehr/visibility` - Get visibility summary
+- ✅ `POST /api/v1/sessions/{id}/patients/{patient_id}/ehr/notes` - Add clinical note
+- ✅ `POST /api/v1/sessions/{id}/patients/{patient_id}/ehr/results` - Add investigation result
+
+### Verification Results
+- ✅ EHR service creates and manages patient records
+- ✅ Progressive revelation works correctly
+- ✅ Time-based visibility (e.g., results visible after resulted time)
+- ✅ Action-based visibility (e.g., notes visible after in-person review)
+- ✅ Always-visible summary data (allergies, diagnoses, medications)
+- ✅ Scenario loader integrates EHR data from JSON
+- ✅ All 13 EHR unit tests passing
+- ✅ All 14 EHR API tests passing
+- ✅ All 17 engine tests still passing
+- ✅ All 33 API tests still passing (77 total)
+- ✅ Demo script demonstrates progressive revelation
+
+**Progress**: 6/6 tasks (100%)
+
+**Documentation**: [docs/phase3-complete.md](docs/phase3-complete.md)
+
+### 🔄 Phase 3 Revision: Dynamic Examination Notes (2026-02-01)
+
+**Key Change**: In-person reviews now **generate new examination notes** based on patient state, rather than revealing pre-existing hidden notes.
+
+**What Changed**:
+- ✅ In-person reviews create NEW clinical notes with dynamic examination findings
+- ✅ All existing clinical notes now ALWAYS visible (realistic EHR access)
+- ✅ Examination findings vary based on patient's current state
+- ✅ Added investigation ordering endpoint (no in-person review required)
+- ✅ Investigation results use state-specific templates
+- ✅ Scenario format updated with examination_findings and investigation_templates
+
+**Rationale**: Better simulates actual clinical practice where:
+1. Doctors can see all existing documentation immediately in EHR
+2. Physical examinations generate new notes documenting current findings
+3. Investigations can be ordered remotely via EHR
+
+**Files Modified**:
+- `backend/app/models/patient.py` - Added examination_findings and investigation_templates to PatientTrajectory
+- `backend/app/models/simulation.py` - Added _generate_examination_note method
+- `backend/app/api/ehr.py` - Added investigation ordering endpoint (18 total API endpoints now)
+- `backend/data/scenarios/simple_test_ehr.json` - Added examination findings and investigation templates
+- `backend/app/services/scenario_loader.py` - Updated to load new trajectory data
+- `backend/demo_ehr_system.py` - Updated to reflect new behavior
+
+**New API Endpoint**:
+- ✅ `POST /api/v1/sessions/{id}/patients/{patient_id}/ehr/investigations/order` - Order investigations
+
+**Documentation**: [docs/phase3-ehr-revision.md](docs/phase3-ehr-revision.md)
+
+---
+
+## 📅 Phase 4: AI Integration (PLANNED)
+
+**Estimated Duration**: 1-2 weeks
 
 ### Task List
-- [ ] Create `models/ehr.py` - PatientRecord, ClinicalNote, VisibilityRule
-- [ ] Create `services/ehr_service.py` - PatientRecordView filtering
-- [ ] Create `api/ehr.py` - EHR endpoints
-- [ ] Add visibility rules to test scenario
-- [ ] Create tests for progressive revelation
-- [ ] Update demo to show EHR access
+- [ ] Create `utils/openai_client.py` - OpenAI API wrapper
+- [ ] Create `services/nurse_ai.py` - NurseInteraction class
+- [ ] Create `api/nurse_chat.py` - Chat endpoints
+- [ ] Add nurse knowledge to test scenario
+- [ ] Create tests for AI interactions (mocked)
+- [ ] Test with real OpenAI API
+- [ ] Refine prompts for clinical realism
 
-**Progress**: 0/6 tasks (0%)
+**Progress**: 0/7 tasks (0%)
 
 ---
 
@@ -203,20 +288,21 @@
 ## 📈 Overall Statistics
 
 ### Code Written
-- **Python**: ~3,600 lines (models, services, API, tests)
-- **JSON**: ~100 lines (scenario)
+- **Python**: ~6,200 lines (models, services, API, tests)
+- **JSON**: ~460 lines (scenarios)
 - **Documentation**: ~1,500 lines (README, CLAUDE.md, API reference, etc.)
 
 ### Tests
-- **Total**: 50 (17 engine + 33 API)
-- **Passing**: 50 ✅
-- **Coverage**: 100% of engine and API layer
+- **Total**: 77 (17 engine + 33 API + 13 EHR unit + 14 EHR API)
+- **Passing**: 77 ✅
+- **Coverage**: 100% of engine, API, and EHR layers
 
 ### Files Created
-- **Source files**: 15 (7 core + 8 API layer)
-- **Test files**: 3 (1 engine + 2 API)
+- **Source files**: 18 (7 core + 8 API + 3 EHR)
+- **Test files**: 5 (1 engine + 2 API + 2 EHR)
 - **Config files**: 4
 - **Documentation**: 6
+- **Demo scripts**: 2
 
 ---
 
@@ -224,7 +310,7 @@
 
 - [x] **M1**: Core simulation engine working (Phase 1) - ✅ 2026-02-01
 - [x] **M2**: API accessible via HTTP (Phase 2) - ✅ 2026-02-01
-- [ ] **M3**: Complete scenario data model (Phase 3)
+- [x] **M3**: Complete scenario data model (Phase 3) - ✅ 2026-02-01
 - [ ] **M4**: AI nurse interactions working (Phase 4)
 - [ ] **M5**: Basic UI functional (Phase 5)
 - [ ] **M6**: Session feedback generated (Phase 6)
@@ -250,6 +336,6 @@ cd backend && source venv/bin/activate && uvicorn app.main:app --reload
 
 ---
 
-**Next Session Goals**: Begin Phase 3 EHR System (6 tasks)
+**Next Session Goals**: Begin Phase 4 AI Integration (7 tasks)
 
 *Update this file after each work session*

@@ -8,9 +8,18 @@ from typing import Any, Dict, List, Optional
 from datetime import datetime
 
 from ..services.simulation_engine import simulation_engine
+from ..services.nurse_logic import nurse_turn, initialize_openai_client
 from ..models.actions import UserAction, ActionResult
+from ..config import settings
 
 router = APIRouter()
+
+# Initialize OpenAI client for nurse AI
+try:
+    openai_client = initialize_openai_client(api_key=settings.openai_api_key)
+except Exception as e:
+    print(f"Warning: Failed to initialize OpenAI client for nurse AI: {e}")
+    openai_client = None
 
 
 # Request/Response Models
@@ -289,4 +298,125 @@ async def document_clinical_note(
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Failed to document note: {str(e)}"
+        )
+
+
+class NurseMessageRequest(BaseModel):
+    """Request to send a message to the nurse."""
+
+    patient_id: str = Field(..., description="ID of the patient being discussed")
+    message: str = Field(..., description="The doctor's question or message to the nurse")
+    conversation_history: Optional[List[Dict[str, str]]] = Field(
+        default_factory=list,
+        description="Previous conversation messages for context"
+    )
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "patient_id": "pt_001",
+                "message": "How does the patient look?",
+                "conversation_history": [
+                    {"role": "nurse", "content": "Hi doctor, could you review Margaret Thompson?"},
+                    {"role": "doctor", "content": "What are you worried about?"},
+                    {"role": "nurse", "content": "She's more breathless than earlier..."}
+                ]
+            }
+        }
+
+
+class NurseMessageResponse(BaseModel):
+    """Response from nurse to doctor's question."""
+
+    success: bool
+    nurse_response: str
+    time_cost_minutes: int = 2
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "success": True,
+                "nurse_response": "She looks quite breathless - she's sitting upright and using her shoulder muscles to breathe. Her lips look a bit blue.",
+                "time_cost_minutes": 2
+            }
+        }
+
+
+@router.post("/sessions/{session_id}/nurse/message", response_model=NurseMessageResponse)
+async def send_nurse_message(session_id: str, request: NurseMessageRequest):
+    """
+    Send a message to the nurse and get an AI-generated response.
+
+    This endpoint uses a two-stage LLM pattern:
+    1. Router LLM classifies the question to filter relevant nursing impression data
+    2. Response LLM generates a realistic nurse response using filtered data
+
+    The nurse will respond based on:
+    - Bedside observations and clinical impressions
+    - Recent events not yet documented in EHR
+    - Recent observations for context
+
+    The nurse will NOT repeat information already visible in the EHR.
+    """
+    if not openai_client:
+        raise HTTPException(
+            status_code=503,
+            detail="Nurse AI service unavailable. OpenAI API key may not be configured."
+        )
+
+    try:
+        # Get simulation session to access patient state
+        session = simulation_engine.get_session(session_id)
+        if not session:
+            raise HTTPException(status_code=404, detail=f"Session {session_id} not found")
+
+        # Get current patient state
+        patient = session.patients.get(request.patient_id)
+        if not patient:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Patient {request.patient_id} not found in session"
+            )
+
+        # Get current state's examination findings (which includes nursing_impression)
+        current_state = patient.current_state
+        patient_state_data = patient.trajectory.get_examination_findings(current_state)
+
+        if not patient_state_data:
+            raise HTTPException(
+                status_code=400,
+                detail=f"No examination findings available for patient state: {current_state}"
+            )
+
+        # Get initial nurse message from conversation history if available
+        initial_nurse_message = None
+        if request.conversation_history:
+            for msg in request.conversation_history:
+                if msg.get("role") == "nurse":
+                    initial_nurse_message = msg.get("content")
+                    break
+
+        # Generate nurse response using AI
+        nurse_response = nurse_turn(
+            client=openai_client,
+            patient_state=patient_state_data,
+            doctor_question=request.message,
+            initial_nurse_message=initial_nurse_message
+        )
+
+        return NurseMessageResponse(
+            success=True,
+            nurse_response=nurse_response,
+            time_cost_minutes=2
+        )
+
+    except HTTPException:
+        raise
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        print(f"Error in nurse message endpoint: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate nurse response: {str(e)}"
         )

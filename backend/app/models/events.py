@@ -21,7 +21,7 @@ class Event(BaseModel):
         "new_request",
         "escalation_response"
     ]
-    scheduled_time: datetime
+    scheduled_time: Optional[datetime] = None  # Set when event is scheduled
     patient_id: Optional[str] = None
     data: Dict[str, Any] = Field(default_factory=dict)
     processed: bool = False

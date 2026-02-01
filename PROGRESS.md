@@ -1,8 +1,8 @@
 # Project Progress Tracker
 
 **Last Updated**: 2026-02-01
-**Current Phase**: Phase 2 (API Layer)
-**Overall Completion**: 14% (1/7 phases)
+**Current Phase**: Phase 3 (EHR System)
+**Overall Completion**: 29% (2/7 phases)
 
 ---
 
@@ -11,7 +11,7 @@
 | Phase | Name | Status | Tests | Progress |
 |-------|------|--------|-------|----------|
 | 1 | Core Simulation Engine | ✅ Complete | 17/17 ✅ | ████████████████████ 100% |
-| 2 | API Layer | ⏳ In Progress | 0/0 | ░░░░░░░░░░░░░░░░░░░░ 0% |
+| 2 | API Layer | ✅ Complete | 33/33 ✅ | ████████████████████ 100% |
 | 3 | EHR System | 📅 Planned | - | ░░░░░░░░░░░░░░░░░░░░ 0% |
 | 4 | AI Integration | 📅 Planned | - | ░░░░░░░░░░░░░░░░░░░░ 0% |
 | 5 | Frontend UI | 📅 Planned | - | ░░░░░░░░░░░░░░░░░░░░ 0% |
@@ -49,50 +49,66 @@
 
 ---
 
-## ⏳ Phase 2: API Layer (CURRENT)
+## ✅ Phase 2: API Layer (COMPLETE)
 
-**Started**: Ready to begin
-**Estimated Duration**: 1 week
-**Target**: Expose simulation engine via REST API
+**Completed**: 2026-02-01
+**Duration**: ~2 hours
+**Tests Passing**: 33/33 ✅
 
-### Task List
+### What Works
+- [x] FastAPI app initialization with CORS
+- [x] Configuration management with pydantic-settings
+- [x] Scenario loader service - reads and validates JSON scenarios
+- [x] Simulation engine service - manages active sessions
+- [x] Session CRUD endpoints - create, read, list, delete sessions
+- [x] Action execution endpoints - 5 convenience endpoints + generic action endpoint
+- [x] API tests - full coverage of all endpoints
+- [x] API documentation - comprehensive reference guide
+- [x] OpenAPI/Swagger docs - interactive API explorer at `/docs`
 
-#### Setup (0/2)
-- [ ] Create `app/main.py` - FastAPI app initialization
-- [ ] Create `app/config.py` - Configuration and settings
+### Key Files
+- ✅ `backend/app/main.py` (61 lines) - FastAPI app
+- ✅ `backend/app/config.py` (56 lines) - Settings
+- ✅ `backend/app/services/scenario_loader.py` (229 lines) - Scenario loading
+- ✅ `backend/app/services/simulation_engine.py` (186 lines) - Engine service
+- ✅ `backend/app/api/sessions.py` (263 lines) - Session endpoints
+- ✅ `backend/app/api/actions.py` (239 lines) - Action endpoints
+- ✅ `backend/tests/test_api/test_sessions.py` (289 lines) - Session tests
+- ✅ `backend/tests/test_api/test_actions.py` (311 lines) - Action tests
+- ✅ `docs/api_reference.md` (574 lines) - API documentation
 
-#### Services (0/2)
-- [ ] Create `services/scenario_loader.py` - Load JSON scenarios
-- [ ] Create `services/simulation_engine.py` - Service layer wrapper
+### API Endpoints (14 total)
+**Session Management:**
+- ✅ `GET /api/v1/scenarios` - List scenarios
+- ✅ `POST /api/v1/sessions/start` - Start new session
+- ✅ `GET /api/v1/sessions` - List all sessions
+- ✅ `GET /api/v1/sessions/{id}` - Get session state
+- ✅ `GET /api/v1/sessions/{id}/timeline` - Get session timeline
+- ✅ `GET /api/v1/sessions/{id}/patients/{patient_id}` - Get patient details
+- ✅ `POST /api/v1/sessions/{id}/complete` - Complete session
+- ✅ `DELETE /api/v1/sessions/{id}` - Delete session
 
-#### API Endpoints (0/2)
-- [ ] Create `api/sessions.py` - Session CRUD
-  - [ ] POST `/api/v1/sessions/start`
-  - [ ] GET `/api/v1/sessions/{id}`
-  - [ ] POST `/api/v1/sessions/{id}/complete`
-  - [ ] GET `/api/v1/scenarios`
-- [ ] Create `api/actions.py` - Action execution
-  - [ ] POST `/api/v1/sessions/{id}/actions`
+**Action Execution:**
+- ✅ `POST /api/v1/sessions/{id}/actions` - Generic action
+- ✅ `POST /api/v1/sessions/{id}/actions/review` - Review patient
+- ✅ `POST /api/v1/sessions/{id}/actions/escalate` - Escalate to senior
+- ✅ `POST /api/v1/sessions/{id}/actions/investigate` - Request investigation
+- ✅ `POST /api/v1/sessions/{id}/actions/document` - Document note
 
-#### Testing (0/3)
-- [ ] Create `tests/test_api/` directory
-- [ ] Create `tests/test_api/test_sessions.py`
-- [ ] Create `tests/test_api/test_actions.py`
+### Verification Results
+- ✅ API server starts without errors
+- ✅ OpenAPI docs accessible at `/docs`
+- ✅ Can create session from JSON scenario
+- ✅ Can execute all action types via API
+- ✅ Time advances correctly (hybrid clock model)
+- ✅ Events trigger at correct times
+- ✅ Session state persists in memory
+- ✅ All 33 API tests passing
+- ✅ All 17 engine tests still passing (50 total)
 
-#### Documentation (0/1)
-- [ ] Create `docs/api_reference.md`
+**Documentation**: [docs/api_reference.md](docs/api_reference.md)
 
-### Verification Checklist
-- [ ] API server starts without errors
-- [ ] OpenAPI docs accessible at `/docs`
-- [ ] Can create session from JSON scenario
-- [ ] Can execute action via API
-- [ ] Time advances correctly
-- [ ] Events trigger at correct times
-- [ ] Session state persists
-- [ ] All API tests passing
-
-**Progress**: 0/13 tasks (0%)
+**Progress**: 13/13 tasks (100%)
 
 ---
 
@@ -187,27 +203,27 @@
 ## 📈 Overall Statistics
 
 ### Code Written
-- **Python**: ~1,200 lines (models, tests, demo)
-- **JSON**: ~70 lines (scenario)
-- **Documentation**: ~800 lines (README, CLAUDE.md, etc.)
+- **Python**: ~3,600 lines (models, services, API, tests)
+- **JSON**: ~100 lines (scenario)
+- **Documentation**: ~1,500 lines (README, CLAUDE.md, API reference, etc.)
 
 ### Tests
-- **Total**: 17
-- **Passing**: 17 ✅
-- **Coverage**: 100% of core engine
+- **Total**: 50 (17 engine + 33 API)
+- **Passing**: 50 ✅
+- **Coverage**: 100% of engine and API layer
 
 ### Files Created
-- **Source files**: 8
-- **Test files**: 1
-- **Config files**: 3
-- **Documentation**: 4
+- **Source files**: 15 (7 core + 8 API layer)
+- **Test files**: 3 (1 engine + 2 API)
+- **Config files**: 4
+- **Documentation**: 6
 
 ---
 
 ## 🎯 Milestones
 
 - [x] **M1**: Core simulation engine working (Phase 1) - ✅ 2026-02-01
-- [ ] **M2**: API accessible via HTTP (Phase 2)
+- [x] **M2**: API accessible via HTTP (Phase 2) - ✅ 2026-02-01
 - [ ] **M3**: Complete scenario data model (Phase 3)
 - [ ] **M4**: AI nurse interactions working (Phase 4)
 - [ ] **M5**: Basic UI functional (Phase 5)
@@ -234,6 +250,6 @@ cd backend && source venv/bin/activate && uvicorn app.main:app --reload
 
 ---
 
-**Next Session Goals**: Complete Phase 2 API Layer (13 tasks)
+**Next Session Goals**: Begin Phase 3 EHR System (6 tasks)
 
 *Update this file after each work session*

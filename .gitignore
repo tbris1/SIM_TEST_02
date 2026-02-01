@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+
+# FastAPI
+.pytest_cache/
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Session data (active sessions are temporary)
+data/sessions/active/*
+!data/sessions/active/.gitkeep
+
+# Node modules (for frontend)
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+
+# Logs
+*.log

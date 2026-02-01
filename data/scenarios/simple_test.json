@@ -1,0 +1,99 @@
+{
+  "scenario_id": "simple_test_001",
+  "metadata": {
+    "title": "Simple Test Scenario - Single Patient",
+    "description": "Minimal scenario for testing simulation engine",
+    "difficulty": "easy",
+    "learning_objectives": [
+      "Recognize deterioration",
+      "Escalate appropriately"
+    ],
+    "estimated_duration_minutes": 30,
+    "simulated_duration_hours": 1.5
+  },
+  "simulation_settings": {
+    "start_time": "2024-01-15T20:00:00"
+  },
+  "patients": [
+    {
+      "patient_id": "pt_001",
+      "name": "Margaret Thompson",
+      "mrn": "MRN12345",
+      "age": 72,
+      "gender": "Female",
+      "ward": "Ward 4A",
+      "bed": "Bed 12",
+      "initial_state": "stable_with_concerns",
+      "trajectory": {
+        "state_change_rules": [
+          {
+            "rule_id": "deterioration_at_2130",
+            "trigger_type": "time_elapsed",
+            "trigger_time": "2024-01-15T21:30:00",
+            "current_state_requirement": "stable_with_concerns",
+            "new_state": "deteriorating",
+            "clinical_manifestation": "Patient has increased work of breathing, O2 sats dropped to 88%",
+            "notification_message": "Nurse calling: Margaret Thompson is more breathless",
+            "urgency": "high"
+          },
+          {
+            "rule_id": "stabilize_on_escalation",
+            "trigger_type": "escalation_occurred",
+            "current_state_requirement": null,
+            "new_state": "stable",
+            "clinical_manifestation": "Registrar reviewed, started NIV, patient improving",
+            "notification_message": "Patient stabilized after registrar review",
+            "urgency": "low"
+          },
+          {
+            "rule_id": "critical_if_no_escalation",
+            "trigger_type": "action_not_taken",
+            "required_action": "escalate",
+            "action_deadline": "2024-01-15T22:00:00",
+            "current_state_requirement": "deteriorating",
+            "new_state": "critically_unwell",
+            "clinical_manifestation": "Patient increasingly drowsy, CO2 retention suspected",
+            "notification_message": "URGENT: Margaret Thompson critically unwell",
+            "urgency": "critical"
+          }
+        ]
+      },
+      "initial_request": {
+        "request_time": "2024-01-15T20:05:00",
+        "request_type": "nurse_call",
+        "nurse_concern": "Patient more short of breath, could you review?",
+        "urgency": "urgent"
+      }
+    }
+  ],
+  "scheduled_events": [
+    {
+      "event_id": "initial_request",
+      "event_type": "new_request",
+      "scheduled_time": "2024-01-15T20:05:00",
+      "patient_id": "pt_001",
+      "data": {
+        "request_type": "nurse_call",
+        "initial_concern": "Patient more short of breath",
+        "urgency": "urgent",
+        "notification_message": "Nurse calling from Ward 4A about Margaret Thompson"
+      }
+    },
+    {
+      "event_id": "abg_results",
+      "event_type": "investigation_result",
+      "scheduled_time": "2024-01-15T20:30:00",
+      "patient_id": "pt_001",
+      "data": {
+        "investigation_type": "ABG",
+        "result_data": {
+          "pH": 7.32,
+          "pCO2": 7.8,
+          "pO2": 8.2,
+          "interpretation": "Type 2 respiratory failure"
+        },
+        "notification_message": "ABG results available for Margaret Thompson"
+      }
+    }
+  ]
+}

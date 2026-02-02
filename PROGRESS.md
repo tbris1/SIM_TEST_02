@@ -252,24 +252,50 @@
 
 ---
 
-## 📅 Phase 5: Frontend UI (PLANNED)
+## 📅 Phase 5: Frontend UI (PLANNED - Ready to Start)
 
-**Estimated Duration**: 2 weeks
+**Estimated Duration**: 28-38 hours (1-2 weeks)
+**Plan Created**: 2026-02-02
+**Documentation**: [docs/phase5-plan.md](docs/phase5-plan.md)
 
-### Task List
-- [ ] Setup React + Vite + TypeScript
-- [ ] Create `services/api.ts` - Backend API client
-- [ ] Create `components/SimulationClock.tsx`
-- [ ] Create `components/RequestInbox.tsx`
-- [ ] Create `components/NurseChat.tsx`
-- [ ] Create `components/EHRViewer.tsx`
-- [ ] Create `components/ActionPanel.tsx`
-- [ ] Create `pages/SimulationSession.tsx`
-- [ ] Create `hooks/useSimulation.ts`
-- [ ] Style with CSS/Tailwind
-- [ ] End-to-end manual testing
+### Implementation Plan Summary
 
-**Progress**: 0/11 tasks (0%)
+**Tech Stack**: React + TypeScript + Vite + Tailwind CSS + React Context/useReducer
+
+**14-Step Implementation**:
+1. Project Setup - Vite + React + TypeScript + Tailwind (2-3h)
+2. API Client Layer - Type-safe client for 21 backend endpoints (3-4h)
+3. State Management - Context + useReducer (3-4h)
+4. Layout & Common Components - App shell, buttons, cards, badges (2-3h)
+5. Simulation Clock - Real-time clock with polling (1-2h)
+6. Session Start Page - Scenario selection (2-3h)
+7. Patient Card & EHR Viewer - Progressive revelation (4-5h)
+8. Action Panel & Modals - Review, escalate, investigate, document (4-5h)
+9. Nurse Chat - AI-powered chat interface (3-4h)
+10. Main Simulation Page - 3-column layout composition (2-3h)
+11. Session Summary Page - Timeline and statistics (2-3h)
+12. Routing & App Entry - React Router setup (1-2h)
+13. Error Handling - Network errors, loading states (1-2h)
+14. Testing & Polish - End-to-end testing, UI refinement (2-3h)
+
+### Key Features
+- Dark blue sidebar with EHR-inspired aesthetic
+- Real-time clock display (polls every 2 seconds)
+- Single-patient MVP focus
+- Desktop-only (1280px+)
+- Type-safe API integration
+- Progressive EHR revelation
+- AI nurse chat with conversation history
+- Modal-based action confirmation
+
+### Critical Files to Build
+- `src/api/types.ts` - TypeScript interfaces for all API responses
+- `src/context/SimulationContext.tsx` - Global state management
+- `src/hooks/useSimulation.ts` - Simulation action hooks
+- `src/pages/SimulationPage.tsx` - Main simulation UI
+- `src/components/ehr/EHRViewer.tsx` - Progressive revelation logic
+
+**Progress**: 0/14 steps (0%)
 
 ---
 
@@ -358,6 +384,8 @@ cd backend && source venv/bin/activate && uvicorn app.main:app --reload
 
 ---
 
-**Next Session Goals**: Complete Phase 4 AI Integration (3 tasks remaining: tests, real API testing, prompt refinement) OR begin Phase 5 Frontend UI
+**Next Session Goals**:
+- **Option A**: Complete Phase 4 AI Integration (3 tasks remaining: tests, real API testing, prompt refinement)
+- **Option B**: Begin Phase 5 Frontend UI (detailed plan ready at [docs/phase5-plan.md](docs/phase5-plan.md))
 
 *Update this file after each work session*

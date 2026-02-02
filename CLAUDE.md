@@ -127,11 +127,34 @@ POST   /api/v1/sessions/{id}/nurse/message   # Send message to nurse AI
 
 ### 📋 Upcoming Phases
 
-#### Phase 5: Frontend - React UI (NEXT)
-- Core components (Clock, Inbox, Chat, EHR, Actions)
-- Main simulation page
-- API client
-- State management hooks
+#### Phase 5: Frontend - React UI (NEXT - Plan Ready)
+**Status**: 📋 Implementation plan complete
+**Documentation**: [docs/phase5-plan.md](docs/phase5-plan.md)
+**Started**: Not yet
+
+**Tech Stack**:
+- React + TypeScript + Vite
+- Tailwind CSS (EHR-inspired aesthetic)
+- React Context + useReducer for state management
+- Desktop-only (1280px+), single-patient MVP
+
+**14-Step Implementation Plan**:
+1. Project setup with Vite + Tailwind
+2. Type-safe API client layer (21 endpoints)
+3. Global state management
+4. Layout components and app shell
+5. Real-time simulation clock
+6. Session start page
+7. Patient card & EHR viewer with progressive revelation
+8. Action panel with modals
+9. AI nurse chat interface
+10. Main simulation page (3-column layout)
+11. Session summary with timeline
+12. React Router setup
+13. Error handling and loading states
+14. Testing and UI polish
+
+**Estimated Duration**: 28-38 hours (1-2 weeks at part-time pace)
 
 #### Phase 6: AI Feedback & Timeline (PLANNED)
 - Timeline visualization

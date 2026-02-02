@@ -56,7 +56,45 @@
             "notification_message": "URGENT: Margaret Thompson critically unwell",
             "urgency": "critical"
           }
-        ]
+        ],
+        "examination_findings": {
+          "stable_with_concerns": {
+            "observations": "RR 22, SpO2 92% on 2L/min via nasal cannula, HR 92, BP 145/88, Temp 36.8°C",
+            "nursing_impression": {
+              "general_appearance": "Patient looks a bit breathless but is managing to speak in full sentences. She's sitting upright and alert.",
+              "concerns": "I'm a bit worried about her breathing - it's faster than usual and she's using her shoulders more. Her oxygen saturations have been dropping slightly over the last hour.",
+              "recent_events": "She's had two nebulizers in the last 3 hours which helped a little. She managed to eat half her dinner about an hour ago.",
+              "mental_state": "She's alert and oriented, seems a bit anxious about her breathing but is cooperative."
+            }
+          },
+          "deteriorating": {
+            "observations": "RR 28, SpO2 88% on 4L/min via nasal cannula, HR 105, BP 152/92, Temp 37.1°C",
+            "nursing_impression": {
+              "general_appearance": "She looks really unwell now - she's struggling to breathe and can only speak a few words at a time. Her lips look slightly blue.",
+              "concerns": "I'm quite worried about her. She's deteriorated significantly in the last half hour despite two more nebulizers. She's exhausting herself with the work of breathing. I think she needs urgent review.",
+              "recent_events": "Her saturations dropped from 92% to 88% over about 20 minutes. I've increased her oxygen to 4 litres but she's not improving. She's also becoming more anxious which seems to be making things worse.",
+              "mental_state": "She's alert but very anxious and frightened. She keeps saying she can't catch her breath. She's still oriented to time and place."
+            }
+          },
+          "critically_unwell": {
+            "observations": "RR 32 shallow, SpO2 85% on 15L via non-rebreathe mask, HR 115, BP 138/85, Temp 37.2°C",
+            "nursing_impression": {
+              "general_appearance": "She's in a critical state - she looks exhausted and her breathing pattern is very abnormal. She's drowsy and her color is terrible, lips and tongue are blue.",
+              "concerns": "This is an emergency. She's barely responding now - I have to shake her shoulder to get a response. I'm very concerned she's going to stop breathing. We need senior help immediately.",
+              "recent_events": "She became drowsier very quickly over the last 10-15 minutes. I've put her on the non-rebreathe mask at 15 litres but it's not helping. She was trying to pull the mask off initially but now she's too drowsy to even do that.",
+              "mental_state": "She's drowsy and confused, only opening her eyes when I talk loudly or touch her. When she does respond, she's disorientated and doesn't seem to know where she is. This is a major change from 30 minutes ago."
+            }
+          },
+          "stable": {
+            "observations": "RR 18, SpO2 95% on 2L/min, HR 82, BP 138/82, Temp 36.9°C",
+            "nursing_impression": {
+              "general_appearance": "She looks so much better now - she's comfortable, breathing easily, and has good color. What a difference from earlier!",
+              "concerns": "I'm much happier with her now. She's stable and responding well to treatment. I'll keep monitoring her closely but I'm not worried anymore.",
+              "recent_events": "Since the registrar started the NIV support about an hour ago, she's improved dramatically. Her breathing has settled right down and her saturations have come up nicely. She's even managed to have a cup of tea.",
+              "mental_state": "She's fully alert and oriented now, chatting normally. She's relieved and says she feels much better. She was asking about when she might be able to go home."
+            }
+          }
+        }
       },
       "initial_request": {
         "request_time": "2024-01-15T20:05:00",

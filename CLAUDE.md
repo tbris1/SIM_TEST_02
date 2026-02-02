@@ -1,8 +1,8 @@
 # CLAUDE.md - Project Context & Progress
 
-**Last Updated**: 2026-02-01 (Clock Model Updated)
+**Last Updated**: 2026-02-02
 **Project**: Medical On-Call Simulation Platform MVP
-**Status**: Phase 1 Complete ✅ (with hybrid real-time clock) | Phase 2 Ready to Start
+**Status**: Phases 1-3 Complete ✅ | Phase 4 (AI Integration) Near Complete 🚧 (70%)
 
 ---
 
@@ -12,7 +12,7 @@ A web-based simulation platform for training final-year medical students in mana
 
 **Key Features**:
 - Time-based mechanics (60 min real time = 3-4 hours sim time)
-- AI-driven nurse interactions (GPT-4)
+- AI-driven nurse interactions (GPT-5)
 - Simulated hospital EHR with progressive information revelation
 - Rule-based patient state transitions
 - Deterministic, reproducible sessions
@@ -32,9 +32,10 @@ A web-based simulation platform for training final-year medical students in mana
 
 #### Phase 1: Core Simulation Engine (COMPLETE)
 **Status**: ✅ All tests passing (17/17)
+**Completed**: 2026-02-01
 
 **What was built**:
-- [x] SimulationClock - Time management (deterministic, action-based)
+- [x] SimulationClock - Time management (hybrid real-time model)
 - [x] EventScheduler - Priority queue for delayed events
 - [x] Patient State Machine - 4 discrete states with rule-based transitions
 - [x] User Actions - 5 action types with time costs
@@ -43,74 +44,90 @@ A web-based simulation platform for training final-year medical students in mana
 - [x] Demo simulation script
 - [x] Simple test scenario JSON
 
-**Key Files Created**:
-- `backend/app/models/events.py` - Event types and models
-- `backend/app/models/patient.py` - Patient state machine
-- `backend/app/models/actions.py` - User action models
-- `backend/app/models/simulation.py` - Core engine (Clock, Scheduler, Session)
-- `backend/tests/test_simulation_engine.py` - Unit tests
-- `data/scenarios/simple_test.json` - Test scenario
-- `backend/demo_simulation.py` - Interactive demo
-
-**Verification**:
-```bash
-cd backend
-source venv/bin/activate
-pytest tests/test_simulation_engine.py -v  # 17 passed
-python demo_simulation.py  # See it in action
-```
-
 **Documentation**: See [docs/phase1-complete.md](docs/phase1-complete.md)
+
+---
+
+#### Phase 2: API Layer with FastAPI (COMPLETE)
+**Status**: ✅ All tests passing (33/33)
+**Completed**: 2026-02-01
+
+**What was built**:
+- [x] FastAPI app with CORS configuration
+- [x] Session management endpoints (create, read, list, delete)
+- [x] Action execution endpoints (5 convenience + 1 generic)
+- [x] Scenario loader service
+- [x] Simulation engine service
+- [x] Comprehensive API tests
+- [x] OpenAPI/Swagger documentation
+
+**API Endpoints** (14 total):
+- Session management: `/api/v1/sessions/*`, `/api/v1/scenarios`
+- Action execution: `/api/v1/sessions/{id}/actions/*`
+
+**Documentation**: See [docs/api_reference.md](docs/api_reference.md)
+
+---
+
+#### Phase 3: EHR System (COMPLETE)
+**Status**: ✅ Tests passing (26/27) - 1 minor test failure
+**Completed**: 2026-02-01
+
+**What was built**:
+- [x] PatientRecord model with progressive revelation
+- [x] ClinicalNote and InvestigationResult models
+- [x] VisibilityRule with time and action-based conditions
+- [x] EHRService for managing patient records
+- [x] EHR API endpoints (4 new endpoints)
+- [x] Dynamic examination note generation
+- [x] Investigation ordering system
+- [x] Comprehensive EHR tests
+
+**Key Revision**: In-person reviews now **generate new examination notes** dynamically based on patient state, rather than revealing pre-existing hidden notes. All existing clinical notes are always visible in EHR.
+
+**Documentation**: See [docs/phase3-complete.md](docs/phase3-complete.md) and [docs/phase3-ehr-revision.md](docs/phase3-ehr-revision.md)
 
 ---
 
 ### 🔄 Current Phase
 
-#### Phase 2: API Layer with FastAPI (IN PROGRESS)
-**Status**: Ready to start
+#### Phase 4: AI Integration - Nurse Chat (NEAR COMPLETE)
+**Status**: 🚧 70% Complete | 76/77 tests passing
 
-**Goals**:
-- Expose simulation engine via REST API
-- Session management (create, get, update)
-- Action execution endpoint
-- CORS configuration for frontend
-- Test with Postman/curl
+**What's Done**:
+- [x] Two-stage LLM pattern implementation
+- [x] OpenAI GPT-5 client integration
+- [x] Nurse interaction logic with topic classification
+- [x] API endpoint for nurse messaging
+- [x] Nursing impressions in patient state data
+- [x] Initial nurse request system
+- [x] Context filtering and fallback handling
 
-**Files to Create**:
-- [ ] `backend/app/main.py` - FastAPI app entry point
-- [ ] `backend/app/config.py` - Configuration and settings
-- [ ] `backend/app/api/sessions.py` - Session CRUD endpoints
-- [ ] `backend/app/api/actions.py` - Action execution endpoint
-- [ ] `backend/app/services/simulation_engine.py` - Service layer refactor
-- [ ] `backend/app/services/scenario_loader.py` - Load scenarios from JSON
-- [ ] `backend/tests/test_api/` - API integration tests
+**What Remains**:
+- [ ] Comprehensive tests for AI interactions (mocked)
+- [ ] Testing with real OpenAI GPT-5 API
+- [ ] Prompt refinement based on clinical realism
+- [ ] Conversation history tracking for multi-turn dialogues
+- [ ] Performance testing and optimization
 
-**API Endpoints to Build**:
+**Key Files**:
+- `backend/app/services/nurse_logic.py` - Two-stage LLM pattern
+- `backend/app/api/actions.py` - Nurse message endpoint
+
+**New API Endpoint**:
 ```
-POST   /api/v1/sessions/start          # Create new session from scenario
-GET    /api/v1/sessions/{id}           # Get session state
-POST   /api/v1/sessions/{id}/actions   # Execute action
-POST   /api/v1/sessions/{id}/complete  # Complete session
-GET    /api/v1/scenarios                # List available scenarios
+POST   /api/v1/sessions/{id}/nurse/message   # Send message to nurse AI
 ```
+
+**Two-Stage LLM Pattern**:
+1. **Router LLM** - Classifies question to filter relevant nursing impression data
+2. **Response LLM** - Generates realistic nurse response using filtered context
 
 ---
 
 ### 📋 Upcoming Phases
 
-#### Phase 3: EHR System (PLANNED)
-- PatientRecord models with full clinical data
-- Visibility rules for progressive information revelation
-- EHR endpoints
-- Clinical notes system
-
-#### Phase 4: AI Integration - Nurse Chat (PLANNED)
-- OpenAI API wrapper
-- NurseInteraction service with prompt engineering
-- Chat endpoints
-- Conversation state management
-
-#### Phase 5: Frontend - React UI (PLANNED)
+#### Phase 5: Frontend - React UI (NEXT)
 - Core components (Clock, Inbox, Chat, EHR, Actions)
 - Main simulation page
 - API client
@@ -136,41 +153,47 @@ medical-oncall-sim/
 ├── backend/
 │   ├── app/
 │   │   ├── __init__.py
-│   │   ├── main.py                    # ⏳ Phase 2
-│   │   ├── config.py                  # ⏳ Phase 2
+│   │   ├── main.py                    # ✅ Phase 2
+│   │   ├── config.py                  # ✅ Phase 2
 │   │   ├── api/
 │   │   │   ├── __init__.py
-│   │   │   ├── sessions.py            # ⏳ Phase 2
-│   │   │   └── actions.py             # ⏳ Phase 2
+│   │   │   ├── sessions.py            # ✅ Phase 2
+│   │   │   ├── actions.py             # ✅ Phase 2 + 🚧 Phase 4
+│   │   │   └── ehr.py                 # ✅ Phase 3
 │   │   ├── models/
 │   │   │   ├── __init__.py
 │   │   │   ├── events.py              # ✅ Phase 1
 │   │   │   ├── patient.py             # ✅ Phase 1
 │   │   │   ├── actions.py             # ✅ Phase 1
 │   │   │   ├── simulation.py          # ✅ Phase 1
-│   │   │   └── ehr.py                 # 📅 Phase 3
+│   │   │   └── ehr.py                 # ✅ Phase 3
 │   │   ├── services/
 │   │   │   ├── __init__.py
-│   │   │   ├── simulation_engine.py   # ⏳ Phase 2
-│   │   │   ├── scenario_loader.py     # ⏳ Phase 2
-│   │   │   ├── ehr_service.py         # 📅 Phase 3
-│   │   │   ├── nurse_ai.py            # 📅 Phase 4
+│   │   │   ├── simulation_engine.py   # ✅ Phase 2
+│   │   │   ├── scenario_loader.py     # ✅ Phase 2
+│   │   │   ├── ehr_service.py         # ✅ Phase 3
+│   │   │   ├── nurse_logic.py         # 🚧 Phase 4
 │   │   │   └── feedback_generator.py  # 📅 Phase 6
-│   │   └── utils/
-│   │       └── openai_client.py       # 📅 Phase 4
 │   ├── tests/
 │   │   ├── __init__.py
 │   │   ├── test_simulation_engine.py  # ✅ Phase 1
-│   │   └── test_api/                  # ⏳ Phase 2
+│   │   ├── test_ehr_system.py         # ✅ Phase 3
+│   │   └── test_api/                  # ✅ Phase 2 & 3
+│   │       ├── test_sessions.py
+│   │       ├── test_actions.py
+│   │       └── test_ehr.py
 │   ├── venv/                          # ✅ Created
-│   ├── requirements.txt               # ✅ Phase 1
-│   └── demo_simulation.py             # ✅ Phase 1
+│   ├── requirements.txt               # ✅ Updated
+│   ├── demo_simulation.py             # ✅ Phase 1
+│   ├── demo_ehr_system.py             # ✅ Phase 3
+│   └── demo_nurse_ai.py               # ✅ Phase 4
 │
 ├── frontend/                          # 📅 Phase 5
 │
 ├── data/
 │   ├── scenarios/
-│   │   ├── simple_test.json           # ✅ Phase 1
+│   │   ├── simple_test_001.json       # ✅ Phase 1
+│   │   ├── simple_test_ehr.json       # ✅ Phase 3 (with nursing impressions)
 │   │   ├── med_oncall_001.json        # 📅 Phase 7
 │   │   └── schema.json                # 📅 Phase 7
 │   └── sessions/
@@ -179,7 +202,10 @@ medical-oncall-sim/
 │
 ├── docs/
 │   ├── phase1-complete.md             # ✅ Phase 1
-│   └── api_reference.md               # ⏳ Phase 2
+│   ├── phase3-complete.md             # ✅ Phase 3
+│   ├── phase3-ehr-revision.md         # ✅ Phase 3
+│   ├── api_reference.md               # ✅ Phase 2
+│   └── clock-model-change.md          # ✅ Phase 1 update
 │
 ├── scripts/
 │   └── validate_scenario.py           # 📅 Phase 7
@@ -187,9 +213,10 @@ medical-oncall-sim/
 ├── .env.example                       # ✅ Created
 ├── .gitignore                         # ✅ Created
 ├── README.md                          # ✅ Created
+├── PROGRESS.md                        # ✅ Updated
 └── CLAUDE.md                          # ✅ This file
 
-Legend: ✅ Complete | ⏳ Current | 📅 Planned
+Legend: ✅ Complete | 🚧 Near Complete | 📅 Planned
 ```
 
 ---
@@ -280,17 +307,32 @@ cp ../.env.example ../.env
 ```bash
 cd backend
 source venv/bin/activate
-PYTHONPATH=$(pwd) pytest tests/test_simulation_engine.py -v
+pytest tests/ -v
 ```
 
-Expected: `17 passed in 0.34s`
+Expected: `76 passed, 1 failed` (1 minor EHR test failure - unrelated to AI)
 
-### Running Demo
+To run specific test suites:
+```bash
+pytest tests/test_simulation_engine.py -v  # Core engine (17 tests)
+pytest tests/test_api/ -v                   # API layer (47 tests)
+pytest tests/test_ehr_system.py -v          # EHR system (13 tests)
+```
+
+### Running Demos
 
 ```bash
 cd backend
 source venv/bin/activate
+
+# Core simulation demo
 PYTHONPATH=$(pwd) python demo_simulation.py
+
+# EHR system demo
+PYTHONPATH=$(pwd) python demo_ehr_system.py
+
+# AI Nurse demo (requires OpenAI API key in .env)
+python demo_nurse_ai.py
 ```
 
 ### Running API (Phase 2+)
@@ -307,42 +349,47 @@ API docs: http://localhost:8000/docs
 
 ## 📝 Current Action Items
 
-### Immediate Next Steps (Phase 2)
+### Immediate Next Steps (Complete Phase 4 or Start Phase 5)
 
-1. **Create `app/main.py`**
-   - Initialize FastAPI app
-   - Add CORS middleware
-   - Include API routers
-   - Add health check endpoint
+**Option A: Complete Phase 4 (AI Integration)**
 
-2. **Create `app/config.py`**
-   - Load environment variables
-   - Configure paths (scenarios, sessions)
-   - Set up logging
+1. **Create tests for nurse AI**
+   - Mock OpenAI API responses
+   - Test router classification logic
+   - Test response generation
+   - Test API endpoint with various questions
+   - Add to test suite
 
-3. **Create `app/services/scenario_loader.py`**
-   - Load scenario JSON files
-   - Validate scenario structure
-   - Convert JSON to Pydantic models
+2. **Test with real OpenAI GPT-5 API**
+   - Configure API key in `.env`
+   - Test with realistic doctor questions
+   - Verify nursing impressions are correctly filtered
+   - Validate response quality and clinical realism
 
-4. **Create `app/services/simulation_engine.py`**
-   - Refactor SimulationSession into service
-   - Add session persistence (save/load from JSON)
-   - Session lifecycle management
+3. **Refine prompts**
+   - Adjust router system prompt for better classification
+   - Enhance nurse response prompt for more realistic dialogue
+   - Test edge cases (ambiguous questions, clarifications)
+   - Iterate based on clinical feedback
 
-5. **Create `app/api/sessions.py`**
-   - POST `/sessions/start` - Create session from scenario
-   - GET `/sessions/{id}` - Get current state
-   - POST `/sessions/{id}/complete` - Complete session
+4. **Add conversation history**
+   - Track multi-turn conversations
+   - Maintain context across messages
+   - Store in session state
 
-6. **Create `app/api/actions.py`**
-   - POST `/sessions/{id}/actions` - Execute action
+**Option B: Start Phase 5 (Frontend UI)**
 
-7. **Test API with curl/Postman**
-   - Start session
-   - Execute actions
-   - Verify time advances
-   - Check events trigger correctly
+1. **Setup React + Vite + TypeScript**
+   - Initialize frontend project
+   - Configure build tools
+   - Setup API client
+
+2. **Create core components**
+   - SimulationClock
+   - RequestInbox
+   - NurseChat
+   - EHRViewer
+   - ActionPanel
 
 ---
 
@@ -476,7 +523,7 @@ When resuming or before proceeding:
 
 **Remember**: This is a solo developer project optimized for incremental progress. Each phase is designed to be completable in 1-2 weeks of part-time work. Focus on getting each phase fully working before moving to the next.
 
-**Current Goal**: Complete Phase 2 (API Layer) to enable API-based testing before building frontend.
+**Current Goal**: Either complete Phase 4 (AI Integration) with tests and refinement, OR begin Phase 5 (Frontend UI) to enable end-to-end testing of the full system including AI nurse interactions.
 
 ---
 

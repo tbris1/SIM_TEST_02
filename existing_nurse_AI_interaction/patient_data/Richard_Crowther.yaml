@@ -1,0 +1,177 @@
+patient:
+  personal_details:
+    name: Richard Crowther
+    id: RC123456
+    age: 68
+    dob: 10/06/1956
+    weight: "74 kg"
+  current_nurse: 
+    name: "Laura Jones"
+    phone_number: "64324"
+    registration_number: "4e7499u"
+  escalation_status: "Full escalation"
+  location:
+    ward: AMU 
+    bed: 12
+  initial_nurse_bleep_request: "Hi doctor, please could you review one of my patients, Richard Crowther? He has become more confused this evening and his urine output is very low."
+  admission:
+    reason: "Admitted two days ago with flare of ulcerative colitis causing seven episodes of bloody diarrhoea per day."
+    day: 2
+  medications:
+    allergies: ["NKDA"]
+    regular_medications: 
+      - name: "Lisinopril"
+        dose: "10 mg"
+        route: "oral"
+        frequency: "once daily"
+        last_dose: "this morning"
+      - name: "Mesalazine"
+        dose: "1 g"
+        route: "per rectum"
+        frequency: "once nightly"
+        last_dose: "this evening"
+    new_medications: 
+      - name: "Mesalazine"
+        dose: "1.2 g"
+        route: "oral"
+        frequency: "twice daily"
+        last_dose: "this evening"
+        total_dose_last_24_hours: "2.4 g"
+      - name: "Hydrocortisone"
+        dose: "200 mg"
+        route: "IV"
+        frequency: "three times daily"
+        last_dose: "4 hours ago"
+    as_required_PRN:
+      - name: "Morphine"
+        dose: "5 - 10 mg"
+        route: "oral"
+        frequency: "2 hourly as required"
+        last_dose: "6 hours ago"
+        total_dose_last_24_hours: "20 mg"
+    iv_fluids: 
+      - name: "Normal saline"
+        volume: "1 litre"
+        rate: "125 mls/hr"
+        currently_running: false
+        last_bag_finished: "6 hours ago"
+
+  background:
+    pmh: ["HTN", "ulcerative colitis"]
+    family_history: null
+
+  nursing_observations:
+    obs_history:
+      - time: "18:00"
+        news: 0
+        hr: 82
+        bp: "136/80"
+        rr: 16
+        temp: 36.9
+        spo2: "98% RA"
+        consciousness: "alert"
+      - time: "now"
+        news: 4
+        hr: 105
+        bp: "128/74"
+        rr: 15
+        temp: 37.4
+        spo2: "97% RA"
+        consciousness: "new confusion"
+    fluid_balance:
+      in_last_24_hours: 
+        oral_intake: 300ml
+        iv_fluids: 1000ml
+        total: 1300ml
+      out_last_24_hours:
+        catheter: false
+        urine: 600ml
+        diarrhoea: "Unknown"
+        vomit: 0ml
+        total: "Unknown"
+    stool:
+      episodes_last_24_hours: 3
+      characteristics: "loose, watery, no blood"
+
+  recent_blood_tests: 
+    - test: "FBC"
+      date: "Yesterday"
+      results:
+        hb: 110
+        wcc: 14.5
+        plt: 320
+    - test: "U&E"
+      date: "Yesterday"
+      results:
+        na: 134
+        k: 4.9
+        urea: 8.5
+        creatinine: 120
+        eGFR:
+          result: 58
+          baseline: 90
+    - test: "CRP"
+      date: "Yesterday"
+      results:
+        crp: 85
+
+  symptoms_reported:
+    confusion: "new onset, worse this evening"
+    bowels: "two episodes diarrhoea today, not bloody"
+    urine_output: "approximately 30ml/hour for last 6 hours"
+
+  nurse_permitted_tasks:
+    repeat_observations: 
+      permitted: true
+    ecg:
+      permitted: true
+    urinalysis: 
+      permitted: true
+    send_MSU: 
+      permitted: true
+    monitor_urine_output:
+      permitted: true
+    administer_oxygen:
+      permitted: true
+    iv_fluids:
+      permitted: true
+    give_as_required_PRN_meds:
+      permitted: true
+    insert_urinary_catheter:
+      permitted: true
+    bladder_scan:
+      permitted: true
+    update_family: 
+      permitted: true
+    check_capillary_blood_glucose: 
+      permitted: true
+    check_capillary_blood_ketones: 
+      permitted: true
+    hold_medications: 
+      permitted: true
+    call_phlebotomy: 
+      permitted: true
+    blood_tests:
+      permitted: false
+      reason: "Requires a doctor or phlebotomist"
+    venous_blood_gas: 
+      permitted: false
+      reason: "Requires a doctor"
+    abdominal_examination:
+      permitted: false
+      reason: "Requires a doctor"
+    respiratory_examination:
+      permitted: false
+      reason: "Requires a doctor"
+    cardiovascular_examination:
+      permitted: false
+      reason: "Requires a doctor" 
+    neurological_examination:
+      permitted: false
+      reason: "Requires a doctor"
+    arterial_blood_gas:
+      permitted: false
+      reason: "Requires a doctor"
+    give_new_medications: 
+      permitted: false
+      reason: "Requires a prescription"

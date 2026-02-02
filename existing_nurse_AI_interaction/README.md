@@ -1,0 +1,2 @@
+This is taken straight from an existing project I'm working on as the logic seems to work well for triage. 
+This folder's code is not actually used in this simulation project but is here for inspiration.

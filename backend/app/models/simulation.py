@@ -191,6 +191,10 @@ class SimulationSession(BaseModel):
             # In-person review adds 30 mins (or custom) to simulate travel + assessment
             artificial_time_added = action.time_cost_minutes if action.time_cost_minutes else 30
             new_time = self.clock.add_artificial_time(artificial_time_added)
+        elif action.action_type == "document_note":
+            # Documenting a note adds 3 mins (or custom) to simulate typing
+            artificial_time_added = action.time_cost_minutes if action.time_cost_minutes else 3
+            new_time = self.clock.add_artificial_time(artificial_time_added)
         else:
             # Other actions: just use current real time (no artificial penalty)
             new_time = self.clock.get_current_time()
@@ -207,6 +211,10 @@ class SimulationSession(BaseModel):
         # Generate examination note if this is an in-person review
         if action.action_type == "review_in_person":
             self._generate_examination_note(patient, new_time)
+
+        # Create clinical note if this is documentation action
+        if action.action_type == "document_note":
+            self._create_user_documentation_note(patient, new_time, action.details)
 
         # Calculate actual time advanced (including real time passage)
         time_advanced = int((new_time - old_time).total_seconds() / 60)
@@ -379,6 +387,53 @@ class SimulationSession(BaseModel):
             title=f"In-Person Review at {timestamp.strftime('%H:%M')}",
             content=examination_findings,
             visibility_rule=VisibilityRule(condition=VisibilityCondition.ALWAYS)
+        )
+
+    def _create_user_documentation_note(self, patient: Patient, timestamp: datetime, details: Dict[str, Any]):
+        """
+        Create a clinical note from user documentation action.
+        This records the clinician's documentation in the EHR.
+        """
+        # Import here to avoid circular dependency
+        from ..services.ehr_service import ehr_service
+        from ..models.ehr import NoteType, VisibilityRule, VisibilityCondition
+
+        # Check if patient has an EHR record
+        if not ehr_service.has_record(patient.patient_id):
+            # No EHR record exists - skip note creation
+            return
+
+        # Extract note content and type from action details
+        note_content = details.get("note_content", "")
+        note_type_str = details.get("note_type", "progress")
+
+        # Map string to NoteType enum
+        note_type_map = {
+            "admission": NoteType.ADMISSION,
+            "progress": NoteType.PROGRESS,
+            "consultant_review": NoteType.CONSULTANT_REVIEW,
+            "discharge_summary": NoteType.DISCHARGE_SUMMARY,
+            "investigation_result": NoteType.INVESTIGATION_RESULT,
+            "procedure_note": NoteType.PROCEDURE_NOTE,
+            "nursing_note": NoteType.NURSING_NOTE,
+        }
+        note_type = note_type_map.get(note_type_str, NoteType.PROGRESS)
+
+        # Wrap the free-text content in a dictionary structure as required by EHR schema
+        structured_content = {
+            "clinical_note": note_content
+        }
+
+        # Create the clinical note
+        ehr_service.add_clinical_note(
+            patient_id=patient.patient_id,
+            note_type=note_type,
+            timestamp=timestamp,
+            author="User",  # The trainee documenting
+            author_role="FY1",
+            title=f"Clinical Documentation - {timestamp.strftime('%H:%M')}",
+            content=structured_content,  # Structured content matching EHR schema
+            visibility_rule=VisibilityRule(condition=VisibilityCondition.ALWAYS)  # Immediately visible
         )
 
     def get_state(self) -> Dict[str, Any]:

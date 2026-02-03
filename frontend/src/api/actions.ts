@@ -102,16 +102,15 @@ export const documentClinicalNote = async (
   sessionId: string,
   patientId: string,
   noteContent: string,
-  noteType: string = 'review'
+  noteType: string = 'progress'
 ): Promise<ExecuteActionResponse> => {
-  const params = new URLSearchParams({
-    patient_id: patientId,
-    note_content: noteContent,
-    note_type: noteType,
-  });
-
   const response = await apiClient.post<ExecuteActionResponse>(
-    `/sessions/${sessionId}/actions/document?${params.toString()}`
+    `/sessions/${sessionId}/actions/document`,
+    {
+      patient_id: patientId,
+      note_content: noteContent,
+      note_type: noteType,
+    }
   );
   return response.data;
 };

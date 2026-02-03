@@ -8,6 +8,7 @@ import type {
   PatientDetailsResponse,
   EHRRecordResponse,
   NurseMessageResponse,
+  ClinicalNote,
 } from '../api/types';
 
 // ============================================================================
@@ -71,6 +72,13 @@ export interface SimulationState {
 
   // Nurse conversation history
   nurseConversation: ChatMessage[];
+
+  // Review documentation modal state
+  reviewDocumentationModal: {
+    isOpen: boolean;
+    patientId: string | null;
+    examinationNote: ClinicalNote | null;
+  };
 
   // Loading and error states
   isLoading: boolean;
@@ -153,6 +161,15 @@ export type SimulationAction =
   | { type: 'SESSION_COMPLETE_REQUEST' }
   | { type: 'SESSION_COMPLETE_SUCCESS' }
   | { type: 'SESSION_COMPLETE_FAILURE'; payload: { error: string } }
+  // Review documentation modal
+  | {
+      type: 'OPEN_REVIEW_DOCUMENTATION_MODAL';
+      payload: {
+        patientId: string;
+        examinationNote: ClinicalNote;
+      };
+    }
+  | { type: 'CLOSE_REVIEW_DOCUMENTATION_MODAL' }
   // General state management
   | { type: 'SET_LOADING'; payload: { isLoading: boolean } }
   | { type: 'SET_ERROR'; payload: { error: string | null } }
@@ -176,6 +193,11 @@ export const initialSimulationState: SimulationState = {
   currentPatientEHR: null,
   notifications: [],
   nurseConversation: [],
+  reviewDocumentationModal: {
+    isOpen: false,
+    patientId: null,
+    examinationNote: null,
+  },
   isLoading: false,
   error: null,
 };

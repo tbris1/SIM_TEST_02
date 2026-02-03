@@ -262,9 +262,16 @@ async def request_investigation(
         )
 
 
+class DocumentNoteRequest(BaseModel):
+    """Request to document a clinical note."""
+    patient_id: str
+    note_content: str
+    note_type: str = "progress"
+
+
 @router.post("/sessions/{session_id}/actions/document")
 async def document_clinical_note(
-    session_id: str, patient_id: str, note_content: str, note_type: str = "review"
+    session_id: str, request: DocumentNoteRequest
 ):
     """
     Convenience endpoint for documenting clinical notes.
@@ -274,9 +281,9 @@ async def document_clinical_note(
     try:
         action = UserAction(
             action_type="document_note",
-            patient_id=patient_id,
-            details={"note_content": note_content, "note_type": note_type},
-            time_cost_minutes=5,
+            patient_id=request.patient_id,
+            details={"note_content": request.note_content, "note_type": request.note_type},
+            time_cost_minutes=3,
         )
 
         result = simulation_engine.execute_action(session_id, action)

@@ -217,6 +217,23 @@ export function useSimulation(): UseSimulationReturn {
         // Refresh patient data and EHR after action
         await refreshSessionState();
         await refreshEHR(patientId);
+
+        // Get the updated EHR to retrieve the examination note
+        const updatedEHR = await getPatientEHR(state.sessionId, patientId);
+
+        // The most recent note should be the examination note just created
+        if (updatedEHR.visible_notes && updatedEHR.visible_notes.length > 0) {
+          const latestNote = updatedEHR.visible_notes[0];
+
+          // Open the review documentation modal automatically
+          dispatch({
+            type: 'OPEN_REVIEW_DOCUMENTATION_MODAL',
+            payload: {
+              patientId,
+              examinationNote: latestNote,
+            },
+          });
+        }
       } catch (error) {
         const errorMessage = getErrorMessage(error);
         dispatch({
@@ -338,8 +355,14 @@ export function useSimulation(): UseSimulationReturn {
           },
         });
 
-        await refreshSessionState();
-        await refreshEHR(patientId);
+        // Refresh operations - don't fail the entire action if these fail
+        try {
+          await refreshSessionState();
+          await refreshEHR(patientId);
+        } catch (refreshError) {
+          console.error('Failed to refresh after ordering investigation:', refreshError);
+          // Don't throw - investigation was already ordered successfully
+        }
       } catch (error) {
         const errorMessage = getErrorMessage(error);
         dispatch({

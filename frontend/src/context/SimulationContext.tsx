@@ -25,6 +25,11 @@ const initialState: SimulationState = {
   currentPatientEHR: null,
   notifications: [],
   nurseConversation: [],
+  reviewDocumentationModal: {
+    isOpen: false,
+    patientId: null,
+    examinationNote: null,
+  },
   isLoading: false,
   error: null,
 };
@@ -202,6 +207,27 @@ function simulationReducer(
       return {
         ...state,
         error: null,
+      };
+
+    // Review documentation modal
+    case 'OPEN_REVIEW_DOCUMENTATION_MODAL':
+      return {
+        ...state,
+        reviewDocumentationModal: {
+          isOpen: true,
+          patientId: action.payload.patientId,
+          examinationNote: action.payload.examinationNote,
+        },
+      };
+
+    case 'CLOSE_REVIEW_DOCUMENTATION_MODAL':
+      return {
+        ...state,
+        reviewDocumentationModal: {
+          isOpen: false,
+          patientId: null,
+          examinationNote: null,
+        },
       };
 
     case 'RESET_STATE':

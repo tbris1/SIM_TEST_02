@@ -372,10 +372,20 @@ class SimulationSession(BaseModel):
 
         if not examination_findings:
             # No examination findings defined for this state - use default
-            examination_findings = {
-                "general": "Patient assessed",
-                "summary": f"Patient reviewed in person. Current state: {patient.current_state.value}"
-            }
+            content = f"Patient reviewed in person. Current state: {patient.current_state.value}"
+        else:
+            # Format examination findings as a structured string
+            in_person_note = examination_findings.get("in_person_note", "")
+            in_person_examination = examination_findings.get("in_person_examination", "")
+
+            # Build the content string with Notes and Examination sections
+            parts = []
+            if in_person_note:
+                parts.append(f"Notes\n{in_person_note}")
+            if in_person_examination:
+                parts.append(f"Examination\n{in_person_examination}")
+
+            content = "\n\n".join(parts) if parts else "Patient reviewed in person"
 
         # Generate clinical note with examination findings
         ehr_service.add_clinical_note(
@@ -385,7 +395,7 @@ class SimulationSession(BaseModel):
             author="User",  # The trainee performing the review
             author_role="FY1",
             title=f"In-Person Review at {timestamp.strftime('%H:%M')}",
-            content=examination_findings,
+            content=content,
             visibility_rule=VisibilityRule(condition=VisibilityCondition.ALWAYS)
         )
 

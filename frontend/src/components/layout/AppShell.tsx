@@ -14,6 +14,7 @@ export interface AppShellProps {
   headerClockSlot?: ReactNode;
   headerActionSlot?: ReactNode;
   showSidebar?: boolean;
+  fullHeight?: boolean;
 }
 
 /**
@@ -26,9 +27,10 @@ export function AppShell({
   headerClockSlot,
   headerActionSlot,
   showSidebar = true,
+  fullHeight = false,
 }: AppShellProps) {
   return (
-    <div className="min-h-screen flex bg-gray-50">
+    <div className="min-h-screen flex bg-background">
       {/* Sidebar - Fixed width dark blue sidebar */}
       {showSidebar && (
         <div className="w-64 flex-shrink-0">
@@ -48,10 +50,14 @@ export function AppShell({
         />
 
         {/* Content */}
-        <main className="flex-1 overflow-auto">
-          <div className="container mx-auto px-6 py-8">
-            {children}
-          </div>
+        <main className={fullHeight ? "flex-1 overflow-hidden" : "flex-1 overflow-auto"}>
+          {fullHeight ? (
+            children
+          ) : (
+            <div className="container mx-auto px-6 py-8">
+              {children}
+            </div>
+          )}
         </main>
       </div>
     </div>

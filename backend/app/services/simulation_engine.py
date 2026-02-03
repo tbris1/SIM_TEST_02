@@ -191,7 +191,16 @@ class SimulationEngineService:
             "bed": patient.bed,
             "current_state": patient.current_state,
             "actions_taken": patient.actions_taken,
-            "state_history": patient.state_history,
+            "state_history": [
+                {
+                    "timestamp": change.timestamp.isoformat() if hasattr(change, 'timestamp') else str(change.get('timestamp', '')),
+                    "old_state": str(change.old_state.value if hasattr(change.old_state, 'value') else change.old_state) if hasattr(change, 'old_state') else str(change.get('old_state', '')),
+                    "new_state": str(change.new_state.value if hasattr(change.new_state, 'value') else change.new_state) if hasattr(change, 'new_state') else str(change.get('new_state', '')),
+                    "trigger": str(change.trigger) if hasattr(change, 'trigger') else str(change.get('trigger', '')),
+                    "clinical_notes": str(change.clinical_notes) if hasattr(change, 'clinical_notes') else str(change.get('clinical_notes', '')),
+                }
+                for change in patient.state_history
+            ],
         }
 
     def list_active_sessions(self) -> list[Dict[str, Any]]:

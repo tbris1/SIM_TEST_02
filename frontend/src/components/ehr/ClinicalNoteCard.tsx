@@ -41,9 +41,19 @@ const formatNoteType = (noteType: NoteTypeEnum): string => {
 };
 
 /**
- * Render content object as formatted text
+ * Render content (string or object) as formatted text
  */
-const renderContent = (content: Record<string, any>): ReactElement => {
+const renderContent = (content: string | Record<string, any>): ReactElement => {
+  // Handle string content (new format)
+  if (typeof content === 'string') {
+    return (
+      <div className="text-sm text-gray-900 whitespace-pre-wrap font-mono">
+        {content}
+      </div>
+    );
+  }
+
+  // Handle object content (legacy format)
   return (
     <div className="space-y-2">
       {Object.entries(content).map(([key, value]) => {

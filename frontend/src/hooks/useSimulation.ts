@@ -221,9 +221,9 @@ export function useSimulation(): UseSimulationReturn {
         // Get the updated EHR to retrieve the examination note
         const updatedEHR = await getPatientEHR(state.sessionId, patientId);
 
-        // The most recent note should be the examination note just created
+        // The most recent note should be the examination note just created (last in array)
         if (updatedEHR.visible_notes && updatedEHR.visible_notes.length > 0) {
-          const latestNote = updatedEHR.visible_notes[0];
+          const latestNote = updatedEHR.visible_notes[updatedEHR.visible_notes.length - 1];
 
           // Open the review documentation modal automatically
           dispatch({

@@ -19,56 +19,77 @@ export interface ReviewAndDocumentModalProps {
 }
 
 /**
- * Render examination findings content
+ * Parse and render examination findings as Notes and Examination sections
  */
-const renderExaminationFindings = (content: Record<string, any>): ReactElement => {
+const renderExaminationFindings = (content: string | Record<string, any>): ReactElement => {
+  // Handle case where content is still an object (backend not yet updated)
+  if (typeof content === 'object' && content !== null) {
+    // Check if it has explicit notes and examination fields
+    const notes = content.notes || content.Notes || '';
+    const examination = content.examination || content.Examination || '';
+
+    return (
+      <div className="space-y-4">
+        {notes && (
+          <div>
+            <h4 className="text-xs font-semibold text-blue-800 mb-2">Notes</h4>
+            <p className="text-sm text-blue-900 whitespace-pre-wrap font-mono">
+              {notes}
+            </p>
+          </div>
+        )}
+        {examination && (
+          <div>
+            <h4 className="text-xs font-semibold text-blue-800 mb-2">Examination</h4>
+            <p className="text-sm text-blue-900 whitespace-pre-wrap font-mono">
+              {examination}
+            </p>
+          </div>
+        )}
+        {!notes && !examination && (
+          <div>
+            <h4 className="text-xs font-semibold text-blue-800 mb-2">Notes</h4>
+            <pre className="text-sm text-blue-900 whitespace-pre-wrap font-mono">
+              {JSON.stringify(content, null, 2)}
+            </pre>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Handle string content
+  const contentStr = String(content);
+
+  // Try to parse the content string for "Notes" and "Examination" sections
+  const notesMatch = contentStr.match(/Notes[:\s]*\n([\s\S]*?)(?=\nExamination|$)/i);
+  const examinationMatch = contentStr.match(/Examination[:\s]*\n([\s\S]*?)$/i);
+
+  const notes = notesMatch ? notesMatch[1].trim() : '';
+  const examination = examinationMatch ? examinationMatch[1].trim() : '';
+
+  // Fallback: if parsing fails, show the entire content under Notes
+  const displayNotes = notes || contentStr;
+  const displayExamination = examination || '';
+
   return (
-    <div className="space-y-3">
-      {Object.entries(content).map(([key, value]) => {
-        const formattedKey = key
-          .split('_')
-          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(' ');
-
-        if (typeof value === 'string') {
-          return (
-            <div key={key}>
-              <span className="text-xs font-semibold text-blue-800">
-                {formattedKey}:
-              </span>
-              <p className="text-sm text-blue-900 mt-1 whitespace-pre-wrap">
-                {value}
-              </p>
-            </div>
-          );
-        } else if (Array.isArray(value)) {
-          return (
-            <div key={key}>
-              <span className="text-xs font-semibold text-blue-800">
-                {formattedKey}:
-              </span>
-              <ul className="text-sm text-blue-900 mt-1 list-disc list-inside space-y-1">
-                {value.map((item, index) => (
-                  <li key={index}>{String(item)}</li>
-                ))}
-              </ul>
-            </div>
-          );
-        } else if (typeof value === 'object' && value !== null) {
-          return (
-            <div key={key}>
-              <span className="text-xs font-semibold text-blue-800">
-                {formattedKey}:
-              </span>
-              <pre className="text-xs text-blue-900 mt-1 bg-blue-100 p-2 rounded overflow-x-auto">
-                {JSON.stringify(value, null, 2)}
-              </pre>
-            </div>
-          );
-        }
-
-        return null;
-      })}
+    <div className="space-y-4">
+      {displayNotes && (
+        <div>
+          <h4 className="text-xs font-semibold text-blue-800 mb-2">Notes</h4>
+          <p className="text-sm text-blue-900 whitespace-pre-wrap font-mono">
+            {displayNotes}
+          </p>
+        </div>
+      )}
+      {displayExamination && (
+        <div>
+          <h4 className="text-xs font-semibold text-blue-800 mb-2">Examination</h4>
+          <p className="text-sm text-blue-900 whitespace-pre-wrap font-mono">
+            {displayExamination}
+          </p>
+        </div>
+      )}
     </div>
   );
 };
@@ -137,7 +158,7 @@ export function ReviewAndDocumentModal({
               />
             </svg>
             <h3 className="text-sm font-semibold text-blue-900">
-              Examination Findings (System-Generated)
+              Your In-Person Clinical Findings
             </h3>
           </div>
           <div className="text-sm">
@@ -148,8 +169,8 @@ export function ReviewAndDocumentModal({
         {/* Instruction */}
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
           <p className="text-sm text-gray-700">
-            <strong>Your task:</strong> Based on the examination findings above, document
-            your clinical impression, differential diagnoses, and management plan.
+            <strong>Your task:</strong> Based on the in-person findings above, document
+            your clinical impression and management plan.
           </p>
         </div>
 
@@ -168,15 +189,15 @@ export function ReviewAndDocumentModal({
             placeholder="Example:
 
 Clinical Impression:
-- Patient appears [stable/unwell/deteriorating]
-- Key findings: [summarize examination findings]
-- Differential diagnoses: 1) ... 2) ... 3) ...
+Deterioration despite IV abx: worsening SOB... 
+? Worsening chest sepsis ?? PE ...
 
 Plan:
-1. Investigations: [what tests are needed?]
-2. Treatment: [what interventions?]
-3. Monitoring: [what parameters to watch?]
-4. Escalation: [when to call senior?]"
+1. Urgent bloods (FBC, U&E, CRP, BCs) - I will request now
+2. Escalate antibiotics to...
+3. ...
+
+Dr John Smith, GMC 8000000, Bleep 1234"
             rows={12}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none font-mono text-sm"
             disabled={isLoading}

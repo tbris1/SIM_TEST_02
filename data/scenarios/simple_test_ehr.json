@@ -28,9 +28,9 @@
       "trajectory": {
         "state_change_rules": [
           {
-            "rule_id": "deterioration_at_2130",
+            "rule_id": "deterioration_at_2040",
             "trigger_type": "time_elapsed",
-            "trigger_time": "2024-01-15T21:30:00",
+            "trigger_time": "2024-01-15T20:40:00",
             "current_state_requirement": "stable_with_concerns",
             "new_state": "deteriorating",
             "clinical_manifestation": "Patient has increased work of breathing, O2 sats dropped to 88%",
@@ -60,15 +60,9 @@
         ],
         "examination_findings": {
           "stable_with_concerns": {
-            "general": "Patient sitting up in bed, appears mildly short of breath",
-            "appearance": "Alert and orientated, speaking in full sentences",
-            "observations": "RR 22, SpO2 92% on 2L/min via nasal cannula, HR 92, BP 145/88, Temp 36.8°C",
-            "respiratory": "Using accessory muscles. Reduced air entry bilateral bases with scattered wheeze throughout. Percussion resonant.",
-            "cardiovascular": "Dual heart sounds, normal volume. No murmurs. Peripheral pulses present. Capillary refill <2 seconds.",
-            "abdominal": "Soft, non-tender, no organomegaly",
-            "neurological": "GCS 15/15 (E4V5M6). Pupils equal and reactive.",
-            "skin": "Warm and dry, no rash or cyanosis",
-            "impression": "Patient with known COPD, currently stable but with concerning features (increased work of breathing, borderline oxygen saturations)",
+            "observations": "RR 22, SpO2 92% on 2L/min via NC, HR 92, BP 145/88, T 36.8°C",
+            "in_person_note": "EHR reviewed. Admitted this morning with 3-day history of increased SOB and productive cough. Known COPD GOLD 3. Penicillin allergy noted. Currently on ward with low-level O2 requirement. Nurse concerned about increased work of breathing and dropping saturations over past hour. Patient reports feeling more breathless than earlier today.",
+            "in_person_examination": "Alert, sitting upright in bed, speaking in full sentences but appears mildly dyspnoeic\nObs: RR 22, SpO2 92% on 2L/min via NC, HR 92, BP 145/88, T 36.8°C\nResp: Using accessory muscles. Reduced air entry bilateral bases, scattered wheeze throughout. Percussion resonant\nCVS: HS I + II, no murmurs. Peripheral pulses present, CRT <2s\nAbdo: Soft, non-tender, no organomegaly\nNeuro: GCS 15/15, PEARL",
             "nursing_impression": {
               "general_appearance": "Patient looks a bit breathless but is managing to speak in full sentences. She's sitting upright and alert.",
               "concerns": "I'm a bit worried about her breathing - it's faster than usual and she's using her shoulders more. Her oxygen saturations have been dropping slightly over the last hour.",
@@ -77,15 +71,9 @@
             }
           },
           "deteriorating": {
-            "general": "Patient visibly distressed, significant work of breathing",
-            "appearance": "Alert but anxious, speaking in short phrases only",
-            "observations": "RR 28, SpO2 88% on 4L/min via nasal cannula, HR 105, BP 152/92, Temp 37.1°C",
-            "respiratory": "Marked use of accessory muscles, pursed lip breathing. Poor air entry bilaterally. Widespread wheeze and prolonged expiratory phase.",
-            "cardiovascular": "Tachycardic but regular rhythm. Dual heart sounds. JVP not elevated.",
-            "abdominal": "Soft, non-tender",
-            "neurological": "GCS 15/15, appears fatigued",
-            "skin": "Warm, mild peripheral cyanosis noted",
-            "impression": "COPD exacerbation with worsening respiratory failure. Patient deteriorating despite nebulizers. Consider ABG and escalation.",
+            "observations": "RR 28, SpO2 88% on 4L/min via NC, HR 105, BP 152/92, T 37.1°C",
+            "in_person_note": "Patient has deteriorated significantly in past 30 minutes. Increasing dyspnoea despite further nebulizers. Oxygen requirement increased from 2L to 4L but saturations remain low at 88%. Patient anxious and frightened. Previous admission required NIV for Type 2 respiratory failure (noted in consultant review from 3 months ago).",
+            "in_person_examination": "Visibly distressed, speaking only in short phrases, appears exhausted\nObs: RR 28, SpO2 88% on 4L/min via NC, HR 105, BP 152/92, T 37.1°C\nResp: Marked accessory muscle use, pursed lip breathing. Poor air entry bilaterally, widespread wheeze, prolonged expiratory phase\nCVS: Tachycardic, regular rhythm. HS I + II. JVP not elevated\nAbdo: Soft, non-tender\nNeuro: GCS 15/15, appears fatigued. Mild peripheral cyanosis noted",
             "nursing_impression": {
               "general_appearance": "She looks really unwell now - she's struggling to breathe and can only speak a few words at a time. Her lips look slightly blue.",
               "concerns": "I'm quite worried about her. She's deteriorated significantly in the last half hour despite two more nebulizers. She's exhausting herself with the work of breathing. I think she needs urgent review.",
@@ -94,15 +82,9 @@
             }
           },
           "critically_unwell": {
-            "general": "Patient appears exhausted, drowsy",
-            "appearance": "Reduced level of consciousness, responding to voice only",
-            "observations": "RR 32 shallow, SpO2 85% on 15L via non-rebreathe mask, HR 115, BP 138/85, Temp 37.2°C",
-            "respiratory": "Paradoxical breathing pattern. Minimal air entry. Unable to speak.",
-            "cardiovascular": "Tachycardic, weak pulses",
-            "abdominal": "Unable to assess adequately",
-            "neurological": "GCS 13/15 (E3V4M6) - drowsy, confused. Pupils equal and reactive but sluggish.",
-            "skin": "Clammy, central cyanosis present",
-            "impression": "Critical deterioration. Severe Type 2 respiratory failure with CO2 retention causing reduced consciousness. NIV or intubation urgently required.",
+            "observations": "RR 32, SpO2 85% on 15L via NRB, HR 115, BP 138/85, T 37.2°C, drowsy and confused",
+            "in_person_note": "CRITICAL DETERIORATION. Patient has become drowsy and confused over past 15 minutes. Now GCS 13/15 (was 15/15 earlier). Unable to speak. Breathing pattern abnormal. On 15L via NRB mask but saturations only 85%. Strong suspicion of severe Type 2 respiratory failure with CO2 retention. History of requiring NIV on previous admission. URGENT senior review and respiratory support needed.",
+            "in_person_examination": "Exhausted, drowsy, responding to voice only\nObs: RR 32 (shallow), SpO2 85% on 15L via NRB, HR 115, BP 138/85, T 37.2°C\nResp: Paradoxical breathing pattern. Minimal air entry. Unable to speak\nCVS: Tachycardic, weak pulses\nAbdo: Unable to assess adequately\nNeuro: GCS 13/15 (E3V4M6) - drowsy, confused. PEARL but sluggish response\nCentral cyanosis present, clammy",
             "nursing_impression": {
               "general_appearance": "She's in a critical state - she looks exhausted and her breathing pattern is very abnormal. She's drowsy and her color is terrible, lips and tongue are blue.",
               "concerns": "This is an emergency. She's barely responding now - I have to shake her shoulder to get a response. I'm very concerned she's going to stop breathing. We need senior help immediately.",
@@ -111,15 +93,9 @@
             }
           },
           "stable": {
-            "general": "Patient comfortable at rest",
-            "appearance": "Alert, orientated, conversing normally",
-            "observations": "RR 18, SpO2 95% on 2L/min, HR 82, BP 138/82, Temp 36.9°C",
-            "respiratory": "Comfortable breathing. Good air entry bilaterally. Minimal wheeze.",
-            "cardiovascular": "Normal heart sounds, regular rhythm",
-            "abdominal": "Soft, non-tender",
-            "neurological": "GCS 15/15, appropriate responses",
-            "skin": "Warm and well perfused",
-            "impression": "Clinically improved following appropriate escalation and treatment. Continue current management.",
+            "observations": "RR 18, SpO2 95% on 2L/min, HR 82, BP 138/82, T 36.9°C",
+            "in_person_note": "Patient reviewed following senior escalation. Now on NIV support commenced by registrar approximately 1 hour ago. Marked clinical improvement noted - patient comfortable, speaking normally, good color. Saturations improved to 95%. Patient cooperative with NIV and tolerating well. Continues on treatment for COPD exacerbation.",
+            "in_person_examination": "Comfortable at rest, alert and oriented, conversing normally\nObs: RR 18, SpO2 95% on 2L/min, HR 82, BP 138/82, T 36.9°C\nResp: Comfortable breathing, good air entry bilaterally, minimal wheeze\nCVS: HS I + II, regular rhythm, normal volume\nAbdo: Soft, non-tender\nNeuro: GCS 15/15, appropriate responses\nWell perfused, warm peripheries",
             "nursing_impression": {
               "general_appearance": "She looks so much better now - she's comfortable, breathing easily, and has good color. What a difference from earlier!",
               "concerns": "I'm much happier with her now. She's stable and responding well to treatment. I'll keep monitoring her closely but I'm not worried anymore.",
@@ -256,14 +232,7 @@
                 "Amlodipine 5mg OD"
               ],
               "social_history": "Lives alone, independent. Ex-smoker (50 pack years), quit 5 years ago.",
-              "examination": {
-                "general": "Alert, comfortable at rest",
-                "observations": "RR 20, SpO2 94% on 2L/min, HR 88, BP 142/85, Temp 37.2",
-                "respiratory": "Reduced air entry bilateral bases, scattered wheeze",
-                "cardiovascular": "Dual heart sounds, no murmurs",
-                "abdominal": "Soft, non-tender",
-                "neuro": "GCS 15/15"
-              },
+              "examination": "Alert, comfortable at rest.",
               "initial_plan": [
                 "CXR",
                 "Bloods (FBC, U&E, CRP)",
@@ -284,10 +253,7 @@
             "title": "Evening Ward Round",
             "content": {
               "update": "Patient seen on evening round. Clinically stable, tolerating oral intake.",
-              "examination": {
-                "observations": "RR 18, SpO2 95% on 2L/min, HR 85, BP 138/82",
-                "respiratory": "Improved air entry, less wheeze"
-              },
+              "examination": "Improved air entry, less wheeze \nContinue to observe\nAim discharge tomorrow",
               "plan": [
                 "Continue current management",
                 "Consider discharge tomorrow if stable",

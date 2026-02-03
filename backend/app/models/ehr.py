@@ -7,7 +7,7 @@ and when. This simulates real-world information gathering constraints.
 
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional, Union
 from pydantic import BaseModel, Field
 from uuid import uuid4
 
@@ -78,7 +78,7 @@ class ClinicalNote(BaseModel):
 
     # Content
     title: str
-    content: Dict[str, Any]  # Structured content (e.g., history, examination, plan)
+    content: Union[str, Dict[str, Any]]  # Can be string (new format) or structured dict (legacy)
 
     # Visibility control
     visibility_rule: Optional[VisibilityRule] = None

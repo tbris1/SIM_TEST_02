@@ -9,6 +9,8 @@ from datetime import datetime
 
 from ..services.simulation_engine import simulation_engine
 from ..services.scenario_loader import scenario_loader
+from ..services.vitals_parser import parse_vitals_from_text
+from ..services.news_calculator import calculate_news2_score
 
 router = APIRouter()
 
@@ -56,6 +58,21 @@ class SessionStateResponse(BaseModel):
     is_complete: bool
 
 
+class VitalSignsResponse(BaseModel):
+    """Vital signs response with NEWS2 score."""
+
+    timestamp: str
+    heart_rate: int
+    blood_pressure: str  # Format: "145/88"
+    temperature: float
+    respiratory_rate: int
+    oxygen_saturation: int
+    oxygen_therapy: bool
+    consciousness: str
+    pain_score: Optional[int] = None
+    news_score: int
+
+
 class PatientDetailsResponse(BaseModel):
     """Patient details response."""
 
@@ -69,6 +86,8 @@ class PatientDetailsResponse(BaseModel):
     current_state: str
     actions_taken: List[Dict[str, Any]]
     state_history: List[Dict[str, Any]]
+    latest_vitals: Optional[VitalSignsResponse] = None
+    vitals_history: List[VitalSignsResponse] = []
 
 
 class ScenarioListItem(BaseModel):
@@ -191,7 +210,7 @@ async def get_patient_details(session_id: str, patient_id: str):
     Get detailed information about a specific patient in a session.
 
     Returns patient demographics, current state, action history,
-    and state change history.
+    state change history, and vital signs with NEWS2 score.
     """
     try:
         patient_details = simulation_engine.get_patient_details(session_id, patient_id)
@@ -200,6 +219,56 @@ async def get_patient_details(session_id: str, patient_id: str):
             raise HTTPException(
                 status_code=404, detail=f"Patient {patient_id} not found in session {session_id}"
             )
+
+        # Get session to access scenario data
+        session = simulation_engine.get_session(session_id)
+        if session and session.scenario_id:
+            try:
+                # Load scenario data to get examination findings
+                scenario_data = scenario_loader.load_scenario(session.scenario_id)
+
+                # Get current patient state
+                current_state = patient_details.get("current_state")
+
+                # Find patient in scenario data
+                scenario_patient = None
+                for patient in scenario_data.get("patients", []):
+                    if patient.get("patient_id") == patient_id:
+                        scenario_patient = patient
+                        break
+
+                # Get examination findings for current state
+                observations_text = None
+                if scenario_patient and current_state:
+                    trajectory = scenario_patient.get("trajectory", {})
+                    exam_findings = trajectory.get("examination_findings", {})
+                    state_findings = exam_findings.get(current_state, {})
+                    observations_text = state_findings.get("observations", "")
+
+                # Parse vitals if observations exist
+                if observations_text:
+                    vitals = parse_vitals_from_text(observations_text)
+                    news_score = calculate_news2_score(vitals)
+
+                    # Create vitals response
+                    latest_vitals = VitalSignsResponse(
+                        timestamp=vitals.timestamp.isoformat(),
+                        heart_rate=vitals.heart_rate,
+                        blood_pressure=f"{vitals.blood_pressure_systolic}/{vitals.blood_pressure_diastolic}",
+                        temperature=vitals.temperature,
+                        respiratory_rate=vitals.respiratory_rate,
+                        oxygen_saturation=vitals.oxygen_saturation,
+                        oxygen_therapy=vitals.oxygen_therapy,
+                        consciousness=vitals.consciousness,
+                        pain_score=vitals.pain_score,
+                        news_score=news_score
+                    )
+
+                    patient_details["latest_vitals"] = latest_vitals
+                    patient_details["vitals_history"] = []  # Can add historical readings later
+            except Exception as e:
+                # Log error but don't fail the request if vitals parsing fails
+                print(f"Warning: Failed to parse vitals: {e}")
 
         return PatientDetailsResponse(**patient_details)
     except ValueError as e:

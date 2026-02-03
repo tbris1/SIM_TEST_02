@@ -24,6 +24,8 @@ function AppContent() {
       navItems={navItems}
       headerTitle="Medical On-Call Simulation"
       headerClockSlot={<SimulationClock />}
+      showSidebar={!isSimulationActive}
+      fullHeight={isSimulationActive}
     >
       {isSimulationActive ? <SimulationPage /> : <StartPage />}
     </AppShell>

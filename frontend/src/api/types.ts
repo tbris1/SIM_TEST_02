@@ -121,6 +121,22 @@ export interface StateChange {
 /**
  * Patient details response
  */
+/**
+ * Vital signs response with NEWS2 score
+ */
+export interface VitalSignsResponse {
+  timestamp: string;
+  heart_rate: number;
+  blood_pressure: string;
+  temperature: number;
+  respiratory_rate: number;
+  oxygen_saturation: number;
+  oxygen_therapy: boolean;
+  consciousness: string;
+  pain_score?: number;
+  news_score: number;
+}
+
 export interface PatientDetailsResponse {
   patient_id: string;
   name: string;
@@ -132,6 +148,8 @@ export interface PatientDetailsResponse {
   current_state: PatientState;
   actions_taken: Array<Record<string, any>>;
   state_history: StateChange[];
+  latest_vitals?: VitalSignsResponse;
+  vitals_history?: VitalSignsResponse[];
 }
 
 /**
@@ -236,7 +254,7 @@ export interface ClinicalNote {
   author: string;
   author_role: string;
   title: string;
-  content: Record<string, any>;
+  content: string | Record<string, any>; // Supports both string (new) and object (legacy) formats
   visibility_rule?: VisibilityRule;
   is_visible: boolean;
 }
@@ -330,7 +348,7 @@ export interface AddClinicalNoteRequest {
   author: string;
   author_role: string;
   title: string;
-  content: Record<string, any>;
+  content: string;
   visibility_condition?: VisibilityCondition;
   required_action?: string;
   visible_after_time?: string; // ISO format

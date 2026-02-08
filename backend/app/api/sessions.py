@@ -281,12 +281,12 @@ async def get_patient_details(session_id: str, patient_id: str):
                     vitals_timestamps_seen.add(latest_vitals.timestamp)
                     print(f"DEBUG: Added current vitals with timestamp {latest_vitals.timestamp}, NEWS={latest_vitals.news_score}")
 
-                    # Add historical vitals from previous states (sorted newest to oldest)
-                    # Sort state_history by timestamp descending to ensure correct order
+                    # Add historical vitals from previous states (sorted oldest to newest)
+                    # Process in chronological order so collision offsets preserve correct sequence
                     sorted_state_history = sorted(
                         state_history,
                         key=lambda x: x.get("timestamp", ""),
-                        reverse=True
+                        reverse=False
                     )
 
                     for state_change in sorted_state_history:
@@ -294,6 +294,12 @@ async def get_patient_details(session_id: str, patient_id: str):
                         old_state_name = state_change.get("old_state")
                         new_state_name = state_change.get("new_state")
                         state_timestamp = state_change.get("timestamp")
+
+                        # Skip if state didn't actually change (e.g., stable → stable)
+                        if old_state_name == new_state_name:
+                            state_timestamp_str = state_timestamp.isoformat() if isinstance(state_timestamp, datetime) else state_timestamp
+                            print(f"DEBUG: Skipping no-op state change {old_state_name} → {new_state_name} at {state_timestamp_str}")
+                            continue
 
                         if old_state_name and state_timestamp:
                             state_timestamp_str = state_timestamp.isoformat() if isinstance(state_timestamp, datetime) else state_timestamp
@@ -310,11 +316,16 @@ async def get_patient_details(session_id: str, patient_id: str):
                                     state_change_dt = state_timestamp if isinstance(state_timestamp, datetime) else datetime.fromisoformat(state_timestamp.replace('Z', '+00:00'))
                                     historical_vitals.timestamp = state_change_dt - timedelta(minutes=1)
 
-                                    # Check if THIS historical timestamp is a duplicate (not the state change timestamp)
+                                    # Handle timestamp collisions by adding seconds offset
+                                    # Process oldest to newest, so newer states get timestamps closer to state change time
                                     historical_ts_iso = historical_vitals.timestamp.isoformat()
-                                    if historical_ts_iso in vitals_timestamps_seen:
-                                        print(f"DEBUG: Skipping duplicate historical vitals at {historical_ts_iso} for state change {old_state_name} → {new_state_name}")
-                                        continue
+                                    collision_offset = 0
+                                    while historical_ts_iso in vitals_timestamps_seen:
+                                        collision_offset += 1
+                                        # Add seconds to move forward in time (closer to state change)
+                                        historical_vitals.timestamp = state_change_dt - timedelta(minutes=1) + timedelta(seconds=collision_offset)
+                                        historical_ts_iso = historical_vitals.timestamp.isoformat()
+                                        print(f"DEBUG: Timestamp collision detected, adjusting historical vitals to {historical_ts_iso} for state {old_state_name}")
 
                                     historical_news_score = calculate_news2_score(historical_vitals)
 

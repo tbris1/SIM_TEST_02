@@ -132,14 +132,14 @@ export function NewsTrendTabs({ vitalsHistory }: NewsTrendTabsProps) {
       </div>
 
       <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-        <TabsList className="w-full justify-start overflow-x-auto flex-nowrap h-auto">
+        <TabsList className="w-full justify-start flex-wrap h-auto">
           {sortedVitals.map((vitals) => {
             const riskInfo = getNewsRiskInfo(vitals.news_score);
             return (
               <TabsTrigger
                 key={vitals.timestamp}
                 value={vitals.timestamp}
-                className="gap-2 flex-shrink-0 data-[state=active]:bg-primary/10"
+                className="gap-2 flex-shrink-0 w-40 data-[state=active]:bg-primary/10"
               >
                 <span className="font-mono text-sm">
                   {formatTime(vitals.timestamp)}

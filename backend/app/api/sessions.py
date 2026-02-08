@@ -5,7 +5,7 @@ API endpoints for simulation session management.
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 from typing import List, Optional, Any, Dict
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from ..services.simulation_engine import simulation_engine
 from ..services.scenario_loader import scenario_loader
@@ -250,9 +250,12 @@ async def get_patient_details(session_id: str, patient_id: str):
                     vitals = parse_vitals_from_text(observations_text)
                     news_score = calculate_news2_score(vitals)
 
+                    # Use session's current simulation time instead of parsed timestamp
+                    current_time = session.clock.get_current_time() if session and session.clock else vitals.timestamp
+
                     # Create vitals response
                     latest_vitals = VitalSignsResponse(
-                        timestamp=vitals.timestamp.isoformat(),
+                        timestamp=current_time.isoformat() if isinstance(current_time, datetime) else current_time,
                         heart_rate=vitals.heart_rate,
                         blood_pressure=f"{vitals.blood_pressure_systolic}/{vitals.blood_pressure_diastolic}",
                         temperature=vitals.temperature,
@@ -265,7 +268,77 @@ async def get_patient_details(session_id: str, patient_id: str):
                     )
 
                     patient_details["latest_vitals"] = latest_vitals
-                    patient_details["vitals_history"] = []  # Can add historical readings later
+
+                    # Build vitals history from state changes
+                    vitals_history = []
+                    vitals_timestamps_seen = set()  # Track timestamps to avoid duplicates
+                    state_history = patient_details.get("state_history", [])
+                    trajectory = scenario_patient.get("trajectory", {})
+                    exam_findings = trajectory.get("examination_findings", {})
+
+                    # Add current vitals as most recent
+                    vitals_history.append(latest_vitals)
+                    vitals_timestamps_seen.add(latest_vitals.timestamp)
+                    print(f"DEBUG: Added current vitals with timestamp {latest_vitals.timestamp}, NEWS={latest_vitals.news_score}")
+
+                    # Add historical vitals from previous states (sorted newest to oldest)
+                    # Sort state_history by timestamp descending to ensure correct order
+                    sorted_state_history = sorted(
+                        state_history,
+                        key=lambda x: x.get("timestamp", ""),
+                        reverse=True
+                    )
+
+                    for state_change in sorted_state_history:
+                        # Use OLD state to capture vitals before the change
+                        old_state_name = state_change.get("old_state")
+                        new_state_name = state_change.get("new_state")
+                        state_timestamp = state_change.get("timestamp")
+
+                        if old_state_name and state_timestamp:
+                            state_timestamp_str = state_timestamp.isoformat() if isinstance(state_timestamp, datetime) else state_timestamp
+                            print(f"DEBUG: Processing state change from {old_state_name} → {new_state_name} at {state_timestamp_str}, using old_state vitals")
+
+                            state_findings = exam_findings.get(old_state_name, {})
+                            state_observations = state_findings.get("observations", "")
+
+                            if state_observations:
+                                try:
+                                    # Parse vitals from this historical state
+                                    historical_vitals = parse_vitals_from_text(state_observations)
+                                    # Set timestamp to 1 minute before state change (vitals taken just before transition)
+                                    state_change_dt = state_timestamp if isinstance(state_timestamp, datetime) else datetime.fromisoformat(state_timestamp.replace('Z', '+00:00'))
+                                    historical_vitals.timestamp = state_change_dt - timedelta(minutes=1)
+
+                                    # Check if THIS historical timestamp is a duplicate (not the state change timestamp)
+                                    historical_ts_iso = historical_vitals.timestamp.isoformat()
+                                    if historical_ts_iso in vitals_timestamps_seen:
+                                        print(f"DEBUG: Skipping duplicate historical vitals at {historical_ts_iso} for state change {old_state_name} → {new_state_name}")
+                                        continue
+
+                                    historical_news_score = calculate_news2_score(historical_vitals)
+
+                                    historical_vitals_response = VitalSignsResponse(
+                                        timestamp=historical_vitals.timestamp.isoformat(),
+                                        heart_rate=historical_vitals.heart_rate,
+                                        blood_pressure=f"{historical_vitals.blood_pressure_systolic}/{historical_vitals.blood_pressure_diastolic}",
+                                        temperature=historical_vitals.temperature,
+                                        respiratory_rate=historical_vitals.respiratory_rate,
+                                        oxygen_saturation=historical_vitals.oxygen_saturation,
+                                        oxygen_therapy=historical_vitals.oxygen_therapy,
+                                        consciousness=historical_vitals.consciousness,
+                                        pain_score=historical_vitals.pain_score,
+                                        news_score=historical_news_score
+                                    )
+
+                                    vitals_history.append(historical_vitals_response)
+                                    vitals_timestamps_seen.add(historical_vitals_response.timestamp)
+                                    print(f"DEBUG: Added historical vitals for old_state {old_state_name}, timestamp {historical_vitals_response.timestamp}, NEWS={historical_vitals_response.news_score}, HR={historical_vitals_response.heart_rate}")
+                                except Exception as e:
+                                    print(f"Warning: Failed to parse historical vitals for old_state {old_state_name}: {e}")
+
+                    patient_details["vitals_history"] = vitals_history
+                    print(f"DEBUG: Final vitals_history has {len(vitals_history)} entries")
             except Exception as e:
                 # Log error but don't fail the request if vitals parsing fails
                 print(f"Warning: Failed to parse vitals: {e}")

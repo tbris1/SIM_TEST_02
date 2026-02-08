@@ -14,6 +14,7 @@ import { InvestigationsList } from '../components/ehr/InvestigationsList';
 import { ActionPanel } from '../components/actions/ActionPanel';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { VitalsQuickView } from '../components/vitals/VitalsQuickView';
+import { NewsTrendTabs } from '../components/vitals/NewsTrendTabs';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { User, FileText, Activity } from 'lucide-react';
 
@@ -141,7 +142,9 @@ export function SimulationPage() {
           <div className="flex-1 overflow-y-auto">
             <div className="p-6">
               <TabsContent value="overview" className="mt-0 space-y-6">
-                {state.currentPatient.latest_vitals ? (
+                {state.currentPatient.vitals_history && state.currentPatient.vitals_history.length > 0 ? (
+                  <NewsTrendTabs vitalsHistory={state.currentPatient.vitals_history} />
+                ) : state.currentPatient.latest_vitals ? (
                   <VitalsQuickView vitals={state.currentPatient.latest_vitals} />
                 ) : (
                   <PatientCard patient={state.currentPatient} />
